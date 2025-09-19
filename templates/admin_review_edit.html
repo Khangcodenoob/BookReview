@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}Sửa chi tiết review{% endblock %}
+{% block content %}
+<div class="admin-header">
+  <h2>Sửa chi tiết review</h2>
+  <p class="muted">Sách: <a href="{{ url_for('book_detail', book_id=review.book_id) }}" target="_blank">{{ review.book_title }}</a></p>
+</div>
+
+<form method="post" action="{{ url_for('admin_review_edit', review_id=review.id) }}" class="form" style="display:grid;grid-template-columns:1fr;gap:12px;max-width:920px">
+  <div>
+    <label>Nội dung gốc</label>
+    <div class="panel" style="padding:12px;border:1px solid var(--border);border-radius:8px;background:var(--panel)">
+      {{ render_markdown(review.content)|safe }}
+    </div>
+  </div>
+  <label>
+    Ghi chú chi tiết (Markdown)
+    <textarea name="details" rows="10" placeholder="Viết phân tích chi tiết, điểm mạnh/yếu, trích dẫn..." style="width:100%;padding:12px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text)">{{ review.details or '' }}</textarea>
+  </label>
+  <label>
+    Trạng thái
+    <select name="status" style="padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text)">
+      <option value="">(Giữ nguyên)</option>
+      <option value="approved" {{ 'selected' if review.status=='approved' else '' }}>approved</option>
+      <option value="pending" {{ 'selected' if review.status=='pending' else '' }}>pending</option>
+      <option value="rejected" {{ 'selected' if review.status=='rejected' else '' }}>rejected</option>
+    </select>
+  </label>
+  <div class="form-actions" style="display:flex;gap:10px">
+    <button class="btn" type="submit">Lưu</button>
+    <a class="btn secondary" href="{{ url_for('admin_reviews_queue') }}">Hủy</a>
+  </div>
+</form>
+{% endblock %}
+
+

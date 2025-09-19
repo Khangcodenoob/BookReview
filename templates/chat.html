@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block title %}Gợi ý sách thông minh{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">🤖 Gợi ý sách thông minh</h1>
+  <p class="page-subtitle">Trợ lý AI giúp bạn tìm kiếm sách phù hợp với sở thích và nhu cầu</p>
+</div>
+
+<div class="chat-container" style="max-width: 1000px; margin: 0 auto;">
+  <!-- Chat Interface -->
+  <div class="chat-interface" style="background: var(--panel); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; box-shadow: var(--shadow);">
+    
+    <!-- Chat Header -->
+    <div class="chat-header" style="background: linear-gradient(90deg, var(--primary), var(--accent)); color: white; padding: 16px 20px; display: flex; align-items: center; gap: 12px;">
+      <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px;">
+        🤖
+      </div>
+      <div>
+        <h3 style="margin: 0; font-size: 18px; font-weight: 600;">Trợ lý sách AI</h3>
+        <p style="margin: 0; font-size: 14px; opacity: 0.9;">Sẵn sàng giúp bạn tìm sách hay!</p>
+      </div>
+      <div style="margin-left: auto; display: flex; gap: 8px;">
+        <button id="clear-chat" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 12px;">
+          🗑️ Xóa
+        </button>
+      </div>
+    </div>
+
+    <!-- Chat Messages -->
+    <div id="chatbox" style="height: 500px; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 16px;">
+      <!-- Welcome Message -->
+      <div class="message bot-message" style="display: flex; gap: 12px; align-items: flex-start;">
+        <div style="width: 32px; height: 32px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;">
+          🤖
+        </div>
+        <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px; max-width: 80%;">
+          <p style="margin: 0 0 12px 0; color: var(--text);">Xin chào! Tôi là trợ lý AI chuyên về sách. Tôi có thể giúp bạn:</p>
+          <ul style="margin: 0; padding-left: 20px; color: var(--muted);">
+            <li>Tìm sách theo thể loại yêu thích</li>
+            <li>Đề xuất sách dựa trên tác giả</li>
+            <li>Gợi ý sách theo chủ đề cụ thể</li>
+            <li>Tìm sách phù hợp với tâm trạng</li>
+          </ul>
+          <p style="margin: 12px 0 0 0; color: var(--text);">Hãy cho tôi biết bạn đang tìm kiếm gì nhé! 📚</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Suggestions -->
+    <div class="quick-suggestions" style="padding: 16px 20px; border-top: 1px solid var(--border); background: var(--bg);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <p style="margin: 0; color: var(--muted); font-size: 14px; font-weight: 500;">💡 Gợi ý nhanh:</p>
+        <div style="display: flex; gap: 8px;">
+          <button id="shuffle-suggestions" style="background: var(--panel); border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; font-size: 11px; color: var(--text); cursor: pointer; transition: all 0.2s;">
+            🔀 Xáo trộn
+          </button>
+          <button id="more-suggestions" style="background: var(--panel); border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; font-size: 11px; color: var(--text); cursor: pointer; transition: all 0.2s;">
+            ➕ Thêm
+          </button>
+        </div>
+      </div>
+      <div id="suggestions-container" style="display: flex; flex-wrap: wrap; gap: 8px;">
+        <button class="suggestion-btn" data-suggestion="Sách kinh tế hay" style="background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 6px 12px; font-size: 12px; color: var(--text); cursor: pointer; transition: all 0.2s;">💼 Kinh tế</button>
+        <button class="suggestion-btn" data-suggestion="Tiểu thuyết tình cảm" style="background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 6px 12px; font-size: 12px; color: var(--text); cursor: pointer; transition: all 0.2s;">💕 Tình cảm</button>
+        <button class="suggestion-btn" data-suggestion="Sách khoa học thú vị" style="background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 6px 12px; font-size: 12px; color: var(--text); cursor: pointer; transition: all 0.2s;">🔬 Khoa học</button>
+        <button class="suggestion-btn" data-suggestion="Sách tâm lý học" style="background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 6px 12px; font-size: 12px; color: var(--text); cursor: pointer; transition: all 0.2s;">🧠 Tâm lý</button>
+        <button class="suggestion-btn" data-suggestion="Sách lịch sử Việt Nam" style="background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 6px 12px; font-size: 12px; color: var(--text); cursor: pointer; transition: all 0.2s;">🏛️ Lịch sử</button>
+        <button class="suggestion-btn" data-suggestion="Sách thiếu nhi hay" style="background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 6px 12px; font-size: 12px; color: var(--text); cursor: pointer; transition: all 0.2s;">🎈 Thiếu nhi</button>
+        <button class="suggestion-btn" data-suggestion="Sách self-help hay" style="background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 6px 12px; font-size: 12px; color: var(--text); cursor: pointer; transition: all 0.2s;">💪 Self-help</button>
+        <button class="suggestion-btn" data-suggestion="Sách công nghệ mới" style="background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 6px 12px; font-size: 12px; color: var(--text); cursor: pointer; transition: all 0.2s;">💻 Công nghệ</button>
+        <button class="suggestion-btn" data-suggestion="Sách nấu ăn ngon" style="background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 6px 12px; font-size: 12px; color: var(--text); cursor: pointer; transition: all 0.2s;">🍳 Nấu ăn</button>
+        <button class="suggestion-btn" data-suggestion="Sách du lịch thú vị" style="background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 6px 12px; font-size: 12px; color: var(--text); cursor: pointer; transition: all 0.2s;">✈️ Du lịch</button>
+      </div>
+    </div>
+
+    <!-- Chat Input -->
+    <div class="chat-input-container" style="padding: 20px; border-top: 1px solid var(--border); background: var(--panel);">
+      <form id="chatform" style="display: flex; gap: 12px; align-items: flex-end;">
+        <div style="flex: 1; position: relative;">
+          <textarea id="prompt" name="prompt" placeholder="Hỏi tôi về thể loại, tác giả, chủ đề hoặc mô tả sách bạn muốn tìm..." style="width: 100%; min-height: 44px; max-height: 120px; padding: 12px 16px; border: 1px solid var(--border); border-radius: 12px; background: var(--bg); color: var(--text); resize: none; font-family: inherit; font-size: 14px; line-height: 1.4;" rows="1"></textarea>
+          <div style="position: absolute; bottom: 8px; right: 12px; color: var(--muted); font-size: 12px;">
+            <span id="char-count">0</span>/500
+          </div>
+        </div>
+        <button class="btn" type="submit" style="height: 44px; padding: 0 20px; display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="22" y1="2" x2="11" y2="13"/>
+            <polygon points="22,2 15,22 11,13 2,9 22,2"/>
+          </svg>
+          <span>Gửi</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Features Section -->
+  <div class="chat-features" style="margin-top: 32px; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+    <div class="feature-card" style="background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px; text-align: center;">
+      <div style="font-size: 32px; margin-bottom: 12px;">🎯</div>
+      <h4 style="margin: 0 0 8px 0; color: var(--text);">Đề xuất chính xác</h4>
+      <p style="margin: 0; color: var(--muted); font-size: 14px;">AI phân tích sở thích và đưa ra gợi ý sách phù hợp nhất</p>
+    </div>
+    <div class="feature-card" style="background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px; text-align: center;">
+      <div style="font-size: 32px; margin-bottom: 12px;">📚</div>
+      <h4 style="margin: 0 0 8px 0; color: var(--text);">Thư viện phong phú</h4>
+      <p style="margin: 0; color: var(--muted); font-size: 14px;">Hàng trăm cuốn sách từ nhiều thể loại khác nhau</p>
+    </div>
+    <div class="feature-card" style="background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px; text-align: center;">
+      <div style="font-size: 32px; margin-bottom: 12px;">⚡</div>
+      <h4 style="margin: 0 0 8px 0; color: var(--text);">Phản hồi nhanh</h4>
+      <p style="margin: 0; color: var(--muted); font-size: 14px;">Nhận gợi ý sách ngay lập tức với AI thông minh</p>
+    </div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='chat.js') }}"></script>
+{% endblock %}

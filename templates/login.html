@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %}Đăng nhập{% endblock %}
+{% block content %}
+<section class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-header">
+      <h2>Đăng nhập</h2>
+      <p>Chào mừng quay lại Hybi Books</p>
+    </div>
+    <form method="post" class="form auth-form" novalidate>
+      <div class="form-group">
+        <label for="login-username">Tên đăng nhập</label>
+        <input id="login-username" name="username" autocomplete="username" required>
+      </div>
+
+      <div class="form-group">
+        <label for="login-password">Mật khẩu</label>
+        <div class="password-field">
+          <input id="login-password" name="password" type="password" autocomplete="current-password" required>
+          <button type="button" class="toggle-password" aria-label="Hiện/ẩn mật khẩu">Hiện</button>
+        </div>
+      </div>
+
+      <div class="form-row between">
+        <label class="checkbox">
+          <input type="checkbox" name="remember" value="1"> Ghi nhớ đăng nhập
+        </label>
+        <a class="link" href="{{ url_for('password_forgot') }}">Quên mật khẩu?</a>
+      </div>
+
+      <button class="btn primary full" type="submit">Đăng nhập</button>
+      <div class="auth-divider">hoặc</div>
+      <a class="btn secondary full" href="{{ url_for('register') }}">Tạo tài khoản mới</a>
+    </form>
+  </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const btn = document.querySelector('.toggle-password');
+  const input = document.getElementById('login-password');
+  if (btn && input) {
+    btn.addEventListener('click', function() {
+      const show = input.getAttribute('type') === 'password';
+      input.setAttribute('type', show ? 'text' : 'password');
+      this.textContent = show ? 'Ẩn' : 'Hiện';
+    });
+  }
+});
+</script>
+{% endblock %}
+

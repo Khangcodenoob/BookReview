@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}Tags{% endblock %}
+{% block content %}
+<div class="admin-header">
+  <h2>Tags</h2>
+  <form method="post" action="{{ url_for('admin_tags_new') }}" class="form" style="grid-template-columns:1fr auto;align-items:end;max-width:420px">
+    <label>Tên tag
+      <input name="name" required placeholder="VD: cổ điển">
+    </label>
+    <button class="btn" type="submit">Thêm</button>
+  </form>
+  <p class="muted">Chỉ dành cho admin</p>
+  <p><a class="btn secondary" href="{{ url_for('admin_books') }}">← Quản trị sách</a></p>
+  
+</div>
+<table class="table">
+  <thead>
+    <tr><th>ID</th><th>Tên</th><th></th></tr>
+  </thead>
+  <tbody>
+    {% for t in tags %}
+    <tr>
+      <td>{{ t.id }}</td>
+      <td>{{ t.name }}</td>
+      <td style="text-align:right">
+        <form method="post" action="{{ url_for('admin_tags_delete', tag_id=t.id) }}" onsubmit="return confirm('Xoá tag này?')">
+          <button class="btn secondary" type="submit">Xoá</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+{% endblock %}
+
+

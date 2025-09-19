@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% block title %}Đăng ký{% endblock %}
+{% block content %}
+<section class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-header">
+      <h2>Tạo tài khoản</h2>
+      <p>Tham gia cộng đồng review sách ngay hôm nay</p>
+    </div>
+    <form method="post" class="form auth-form" novalidate>
+      <div class="form-group">
+        <label for="reg-email">Email</label>
+        <input id="reg-email" name="email" type="email" autocomplete="email" required>
+      </div>
+
+      <div class="form-group">
+        <label for="reg-username">Email / Tên đăng nhập</label>
+        <input id="reg-username" name="username" autocomplete="username" required>
+      </div>
+
+      <div class="form-group">
+        <label for="reg-password">Mật khẩu</label>
+        <div class="password-field">
+          <input id="reg-password" name="password" type="password" autocomplete="new-password" required>
+          <button type="button" class="toggle-password" data-target="#reg-password">Hiện</button>
+        </div>
+        <div class="pw-strength" aria-hidden="true">
+          <div class="pw-bar"></div>
+          <span class="pw-label">Độ mạnh: yếu</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="reg-password2">Nhập lại mật khẩu</label>
+        <div class="password-field">
+          <input id="reg-password2" type="password" autocomplete="new-password" required>
+          <button type="button" class="toggle-password" data-target="#reg-password2">Hiện</button>
+        </div>
+      </div>
+
+      <label class="checkbox">
+        <input type="checkbox" id="agree" required> Tôi đồng ý với Điều khoản & Chính sách
+      </label>
+
+      {% if config.RECAPTCHA_SITEKEY %}
+      <div class="g-recaptcha" data-sitekey="{{ config.RECAPTCHA_SITEKEY }}"></div>
+      <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+      {% endif %}
+
+      <button class="btn primary full" type="submit">Đăng ký</button>
+      <div class="auth-divider">hoặc</div>
+      <a class="btn secondary full" href="{{ url_for('login') }}">Đã có tài khoản</a>
+    </form>
+  </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // toggle visibility
+  document.querySelectorAll('.toggle-password').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const targetSel = this.getAttribute('data-target');
+      const input = document.querySelector(targetSel);
+      if (!input) return;
+      const show = input.getAttribute('type') === 'password';
+      input.setAttribute('type', show ? 'text' : 'password');
+      this.textContent = show ? 'Ẩn' : 'Hiện';
+    });
+  });
+  // strength meter
+  const pw = document.getElementById('reg-password');
+  const bar = document.querySelector('.pw-bar');
+  const lbl = document.querySelector('.pw-label');
+  if (pw && bar && lbl) {
+    pw.addEventListener('input', function() {
+      const v = this.value || '';
+      let score = 0;
+      if (v.length >= 8) score += 1;
+      if (/[A-Z]/.test(v)) score += 1;
+      if (/[0-9]/.test(v)) score += 1;
+      if (/[^A-Za-z0-9]/.test(v)) score += 1;
+      const pct = [0,25,50,75,100][score];
+      bar.style.width = pct + '%';
+      const labels = ['yếu','yếu','trung bình','khá','mạnh'];
+      lbl.textContent = 'Độ mạnh: ' + labels[score];
+      bar.className = 'pw-bar level-' + score;
+    });
+  }
+  // simple confirm validation
+  const pw2 = document.getElementById('reg-password2');
+  if (pw && pw2) {
+    const checkMatch = () => {
+      pw2.setCustomValidity(pw.value !== pw2.value ? 'Mật khẩu không khớp' : '');
+    };
+    pw.addEventListener('input', checkMatch);
+    pw2.addEventListener('input', checkMatch);
+  }
+});
+</script>
+{% endblock %}
+

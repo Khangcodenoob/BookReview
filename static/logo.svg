@@ -1,0 +1,22 @@
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hybi Books Logo">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#22c55e"/>
+      <stop offset="100%" stop-color="#10b981"/>
+    </linearGradient>
+    <filter id="s" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="rgba(0,0,0,0.25)"/>
+    </filter>
+  </defs>
+  <rect x="8" y="8" width="112" height="112" rx="20" fill="#0f172a"/>
+  <rect x="12" y="12" width="104" height="104" rx="16" fill="url(#g)"/>
+  <g filter="url(#s)">
+    <path d="M40 38h28c10.5 0 19 8.5 19 19v33a2 2 0 0 1-3.2 1.6c-6.7-4.6-12.3-6.9-18.3-6.9H40z" fill="#06210e" opacity=".15"/>
+    <path d="M36 38h32a20 20 0 0 1 20 20v34H52a16 16 0 0 0-16 16V38z" fill="#ffffff"/>
+    <path d="M36 38h10v70H36z" fill="#e5f7ed"/>
+    <path d="M58 52h20a2 2 0 0 1 0 4H58a2 2 0 0 1 0-4zm0 14h20a2 2 0 1 1 0 4H58a2 2 0 1 1 0-4zm0 14h14a2 2 0 1 1 0 4H58a2 2 0 1 1 0-4z" fill="#10b981"/>
+    <path d="M52 90h36v6a6 6 0 0 1-6 6H52z" fill="#eafaf2"/>
+  </g>
+  <text x="20" y="30" fill="#06210e" opacity=".4" font-family="Inter, Arial" font-size="12" font-weight="700">HYBI</text>
+</svg>
+

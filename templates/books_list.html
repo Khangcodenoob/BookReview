@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% block title %}Danh sách sách{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">Thư viện sách</h1>
+  <p class="page-subtitle">Khám phá bộ sưu tập sách phong phú của chúng tôi</p>
+</div>
+
+<div class="filters-section">
+  <form method="get" class="filters-form">
+    <div class="filter-group">
+      <div class="search-group">
+        <input type="text" name="q" placeholder="Tìm kiếm sách, tác giả..." value="{{ q }}" class="search-field">
+        <button class="btn btn-primary" type="submit">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="M21 21l-4.35-4.35"/>
+          </svg>
+          Tìm kiếm
+        </button>
+      </div>
+    </div>
+    
+    <div class="filter-row">
+      <div class="filter-item">
+        <label>Thể loại</label>
+        <select name="genre" class="filter-select">
+          <option value="">Tất cả thể loại</option>
+          {% for g in genres %}
+            <option value="{{ g }}" {% if selected_genre==g %}selected{% endif %}>{{ g }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      
+      <div class="filter-item">
+        <label>Sắp xếp</label>
+        <select name="sort" class="filter-select">
+          <option value="new" {% if sort=='new' %}selected{% endif %}>Mới nhất</option>
+          <option value="az" {% if sort=='az' %}selected{% endif %}>A → Z</option>
+          <option value="za" {% if sort=='za' %}selected{% endif %}>Z → A</option>
+        </select>
+      </div>
+      
+      <div class="filter-item">
+        <label>Nhà xuất bản</label>
+        <input type="text" name="publisher" placeholder="VD: NXB Trẻ" value="{{ publisher or '' }}" class="filter-input">
+      </div>
+      
+      <div class="filter-actions">
+        <a class="btn btn-secondary" href="{{ url_for('books_list') }}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
+          </svg>
+          Xoá lọc
+        </a>
+      </div>
+    </div>
+  </form>
+</div>
+
+{% if books %}
+<div class="books-grid">
+  {% for book in books %}
+    <a class="card" href="{{ url_for('book_detail', book_id=book.id) }}" style="animation-delay: {{ loop.index0 * 0.1 }}s">
+      <div class="cover">
+        <img src="{{ book.cover_url or url_for('static', filename='placeholder.jpg') }}" alt="{{ book.title }}" loading="lazy">
+        <div class="cover-overlay">
+          <div class="book-genre">{{ book.genre }}</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <h3 class="book-title">{{ book.title }}</h3>
+        <p class="book-author">{{ book.author }}</p>
+        <p class="book-desc">{{ (book.description or '')[:140] }}{% if (book.description or '')|length > 140 %}...{% endif %}</p>
+        <div class="book-meta">
+          <span class="book-genre-badge">{{ book.genre }}</span>
+        </div>
+      </div>
+    </a>
+  {% endfor %}
+</div>
+
+{% if total_pages > 1 %}
+<div class="pagination">
+  <div class="pagination-info">
+    <span class="pagination-text">Hiển thị {{ (page-1)*per_page + 1 }}-{{ [page*per_page, total]|min }} trong {{ total }} kết quả</span>
+  </div>
+  <div class="pagination-controls">
+    {% if page > 1 %}
+      <a class="btn btn-secondary pagination-btn" href="{{ url_for('books_list', q=q, genre=selected_genre, publisher=publisher, sort=sort, page=page-1, per_page=per_page) }}">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M15 18l-6-6 6-6"/>
+        </svg>
+        Trước
+      </a>
+    {% endif %}
+    
+    <div class="pagination-numbers">
+      {% for p in range([1, page-2]|max, [total_pages+1, page+3]|min) %}
+        {% if p == page %}
+          <span class="pagination-number active">{{ p }}</span>
+        {% else %}
+          <a class="pagination-number" href="{{ url_for('books_list', q=q, genre=selected_genre, publisher=publisher, sort=sort, page=p, per_page=per_page) }}">{{ p }}</a>
+        {% endif %}
+      {% endfor %}
+    </div>
+    
+    {% if page < total_pages %}
+      <a class="btn btn-secondary pagination-btn" href="{{ url_for('books_list', q=q, genre=selected_genre, publisher=publisher, sort=sort, page=page+1, per_page=per_page) }}">
+        Sau
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 18l6-6-6-6"/>
+        </svg>
+      </a>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+
+{% else %}
+<div class="empty-state">
+  <div class="empty-icon">📚</div>
+  <h3>Không tìm thấy sách nào</h3>
+  <p>Thử thay đổi từ khóa tìm kiếm hoặc bộ lọc để tìm thấy sách bạn muốn.</p>
+  <a class="btn btn-primary" href="{{ url_for('books_list') }}">Xem tất cả sách</a>
+</div>
+{% endif %}
+{% endblock %}
+
+

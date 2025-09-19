@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+{% block title %}{% if is_edit %}Sửa sách{% else %}Thêm sách{% endif %}{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">{% if is_edit %}📝 Sửa sách{% else %}➕ Thêm sách mới{% endif %}</h1>
+  <p class="page-subtitle">{% if is_edit %}Chỉnh sửa thông tin chi tiết của sách{% else %}Thêm sách mới vào thư viện{% endif %}</p>
+</div>
+
+<div class="form-container" style="background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 32px; margin: 24px 0; box-shadow: var(--shadow);">
+  <form method="post" class="form">
+  <!-- Thông tin cơ bản -->
+  <div class="form-section" style="margin-bottom: 32px;">
+    <h3 style="color: var(--text); margin: 0 0 20px 0; font-size: 18px; border-bottom: 2px solid var(--primary); padding-bottom: 8px;">📚 Thông tin cơ bản</h3>
+    
+    <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 20px; margin-bottom: 20px;">
+      <label style="display: flex; flex-direction: column; gap: 8px;">
+        <span style="font-weight: 600; color: var(--text);">Mã sách <span style="color: #ef4444;">*</span></span>
+        <input name="book_code" required placeholder="VD: BK1001" value="{{ (book.book_code if book else '') }}" style="padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text);">
+        <small style="color: var(--muted); font-size: 12px;">Mã định danh duy nhất cho sách</small>
+      </label>
+      <label style="display: flex; flex-direction: column; gap: 8px;">
+        <span style="font-weight: 600; color: var(--text);">Tiêu đề sách <span style="color: #ef4444;">*</span></span>
+        <input name="title" required value="{{ (book.title if book else '') }}" style="padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text);">
+        <small style="color: var(--muted); font-size: 12px;">Tên đầy đủ của cuốn sách</small>
+      </label>
+    </div>
+    
+    <label style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px;">
+      <span style="font-weight: 600; color: var(--text);">Tác giả <span style="color: #ef4444;">*</span></span>
+      <input name="author" required value="{{ (book.author if book else '') }}" style="padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text);">
+      <small style="color: var(--muted); font-size: 12px;">Tên tác giả hoặc nhóm tác giả</small>
+    </label>
+  </div>
+{% if adding_disabled and not is_edit %}
+  <div class="alert" style="background: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; padding: 16px; margin: 20px 0;">
+    <p style="color: #92400e; margin: 0;">⚠️ Chức năng thêm sách tạm thời bị vô hiệu hóa. Vui lòng kiểm tra lại cấu hình database.</p>
+  </div>
+  <div class="actions">
+    <a class="btn secondary" href="{{ url_for('admin_books') }}">← Quay lại</a>
+  </div>
+{% else %}
+  <!-- Thông tin chi tiết -->
+  <div class="form-section" style="margin-bottom: 32px;">
+    <h3 style="color: var(--text); margin: 0 0 20px 0; font-size: 18px; border-bottom: 2px solid var(--accent); padding-bottom: 8px;">🖼️ Hình ảnh & Phân loại</h3>
+    
+    <label style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px;">
+      <span style="font-weight: 600; color: var(--text);">Ảnh bìa sách</span>
+      <input name="cover_url" placeholder="https://example.com/book-cover.jpg" value="{{ (book.cover_url if book else '') }}" style="padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text);">
+      <small style="color: var(--muted); font-size: 12px;">URL hình ảnh bìa sách (khuyến nghị tỷ lệ 3:4)</small>
+    </label>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+      <label style="display: flex; flex-direction: column; gap: 8px;">
+        <span style="font-weight: 600; color: var(--text);">Danh mục</span>
+        <select name="category_id" style="padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text);">
+          <option value="">-- Chọn danh mục --</option>
+          {% set cur_cat = (book.category_id if book else None) %}
+          {% for c in (categories or []) %}
+            <option value="{{ c.id }}" {% if cur_cat==c.id %}selected{% endif %}>{{ c.name }}</option>
+          {% endfor %}
+        </select>
+        <small style="color: var(--muted); font-size: 12px;">Phân loại chính của sách</small>
+      </label>
+      
+      <label style="display: flex; flex-direction: column; gap: 8px;">
+        <span style="font-weight: 600; color: var(--text);">Thể loại</span>
+        <select name="genre" style="padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text);">
+          {% set gval = book.genre if book else '' %}
+          <option value="" {% if not gval %}selected{% endif %}>-- Chọn thể loại --</option>
+          {% for opt in ['Tiểu thuyết','Truyện ngắn','Kinh tế','Văn học','Khoa học','Tâm lý','Thiếu nhi','Lịch sử','Khác'] %}
+            <option value="{{ opt }}" {% if gval==opt %}selected{% endif %}>{{ opt }}</option>
+          {% endfor %}
+        </select>
+        <small style="color: var(--muted); font-size: 12px;">Thể loại phụ của sách</small>
+      </label>
+    </div>
+    
+    <label style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px;">
+      <span style="font-weight: 600; color: var(--text);">Tags</span>
+      <input name="tags" placeholder="VD: cổ điển, châm biếm, bestseller" value="{{ (tags if tags else '') }}" style="padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text);">
+      <small style="color: var(--muted); font-size: 12px;">Từ khóa phân tách bởi dấu phẩy để tìm kiếm dễ dàng</small>
+    </label>
+  </div>
+  
+  <!-- Thông tin xuất bản -->
+  <div class="form-section" style="margin-bottom: 32px;">
+    <h3 style="color: var(--text); margin: 0 0 20px 0; font-size: 18px; border-bottom: 2px solid #fbbf24; padding-bottom: 8px;">📖 Thông tin xuất bản</h3>
+    
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 20px;">
+      <label style="display: flex; flex-direction: column; gap: 8px;">
+        <span style="font-weight: 600; color: var(--text);">Nhà xuất bản</span>
+        <input name="publisher" placeholder="VD: NXB Trẻ, Nhã Nam, Alpha Books" value="{{ (book.publisher if book else '') }}" style="padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text);">
+        <small style="color: var(--muted); font-size: 12px;">Tên nhà xuất bản</small>
+      </label>
+      
+      <label style="display: flex; flex-direction: column; gap: 8px;">
+        <span style="font-weight: 600; color: var(--text);">Số trang</span>
+        <input name="num_pages" type="number" min="1" step="1" placeholder="320" value="{{ (book.num_pages if book and book.num_pages is not none else '') }}" style="padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text);">
+        <small style="color: var(--muted); font-size: 12px;">Tổng số trang</small>
+      </label>
+    </div>
+  </div>
+  
+  <!-- Mô tả -->
+  <div class="form-section" style="margin-bottom: 32px;">
+    <h3 style="color: var(--text); margin: 0 0 20px 0; font-size: 18px; border-bottom: 2px solid #8b5cf6; padding-bottom: 8px;">📝 Mô tả sách</h3>
+    
+    <label style="display: flex; flex-direction: column; gap: 8px;">
+      <span style="font-weight: 600; color: var(--text);">Tóm tắt nội dung</span>
+      <textarea name="description" rows="6" placeholder="Nhập mô tả chi tiết về nội dung, chủ đề và giá trị của cuốn sách..." style="padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text); resize: vertical;">{{ (book.description if book else '') }}</textarea>
+      <small style="color: var(--muted); font-size: 12px;">Mô tả chi tiết về nội dung và giá trị của sách (khuyến nghị 200-500 từ)</small>
+    </label>
+
+    {% if is_edit and book %}
+    <div style="display:flex; gap:8px; margin-top:10px; flex-wrap:wrap">
+      <form method="post" action="{{ url_for('admin_enhance_book_description', book_id=book.id) }}" onsubmit="return confirm('Tạo mô tả dài và hấp dẫn hơn cho sách này?')">
+        <button class="btn secondary" type="submit">Viết mô tả dài hơn</button>
+      </form>
+      <form method="post" action="{{ url_for('admin_generate_review_for_book', book_id=book.id) }}" onsubmit="return confirm('Tạo review biên tập cho sách này?')">
+        <button class="btn secondary" type="submit">Tạo review biên tập</button>
+      </form>
+    </div>
+    {% endif %}
+  </div>
+  <!-- Actions -->
+  <div class="form-actions" style="display: flex; gap: 12px; justify-content: flex-end; padding-top: 24px; border-top: 1px solid var(--border);">
+    <a class="btn secondary" href="{{ url_for('admin_books') }}" style="text-decoration: none;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+      <span>Hủy bỏ</span>
+    </a>
+    <button class="btn" type="submit" style="display: flex; align-items: center; gap: 8px;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/>
+        <polyline points="17,21 17,13 7,13 7,21"/>
+        <polyline points="7,3 7,8 15,8"/>
+      </svg>
+      <span>{% if is_edit %}Cập nhật sách{% else %}Lưu sách mới{% endif %}</span>
+    </button>
+  </div>
+{% endif %}
+  </form>
+</div>
+
+<!-- Hướng dẫn và liên kết -->
+<div class="form-help" style="background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin: 24px 0;">
+  <h3 style="color: var(--text); margin: 0 0 16px 0; font-size: 18px;">💡 Hướng dẫn sử dụng</h3>
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+    <div>
+      <h4 style="color: var(--primary); margin: 0 0 8px 0; font-size: 14px;">📋 Thông tin bắt buộc</h4>
+      <ul style="color: var(--muted); margin: 0; font-size: 13px; line-height: 1.5; padding-left: 16px;">
+        <li>Mã sách: Định danh duy nhất</li>
+        <li>Tiêu đề: Tên đầy đủ của sách</li>
+        <li>Tác giả: Tên tác giả chính</li>
+      </ul>
+    </div>
+    <div>
+      <h4 style="color: var(--accent); margin: 0 0 8px 0; font-size: 14px;">🏷️ Phân loại</h4>
+      <ul style="color: var(--muted); margin: 0; font-size: 13px; line-height: 1.5; padding-left: 16px;">
+        <li>Danh mục: Phân loại chính</li>
+        <li>Thể loại: Phân loại phụ</li>
+        <li>Tags: Từ khóa tìm kiếm</li>
+      </ul>
+    </div>
+    <div>
+      <h4 style="color: #fbbf24; margin: 0 0 8px 0; font-size: 14px;">🔗 Quản lý</h4>
+      <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+        <a href="{{ url_for('admin_categories') }}" class="btn secondary" style="text-decoration: none; font-size: 12px; padding: 6px 12px;">📂 Danh mục</a>
+        <a href="{{ url_for('admin_tags') }}" class="btn secondary" style="text-decoration: none; font-size: 12px; padding: 6px 12px;">🏷️ Tags</a>
+        <a href="{{ url_for('admin_books') }}" class="btn secondary" style="text-decoration: none; font-size: 12px; padding: 6px 12px;">📚 Danh sách</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

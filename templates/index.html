@@ -1,0 +1,836 @@
+{% extends 'base.html' %}
+{% block title %}Trang chủ - Book Review{% endblock %}
+{% block content %}
+
+<div class="section-header" style="margin-top: 12px; margin-bottom: 12px; text-align: center;">
+  <h1 class="section-title" style="font-size: 40px; font-weight: 800; letter-spacing: .3px; margin: 0;">Chào mừng bạn đến với Hybi Books - Nơi đọc review sách miễn phí</h1>
+  <p class="section-subtitle" style="font-size: 16px; margin-top: 6px;">Khám phá những tựa sách được yêu thích và đề xuất</p>
+  </div>
+
+<!-- Dynamic Product Promotion Carousel 🎠 (restored) -->
+<div id="bookCarousel" class="carousel slide" data-bs-ride="carousel">
+  <div class="carousel-inner">
+
+      {% if latest_books %}
+          {% for book in latest_books %}
+              <div class="carousel-item {{ 'active' if loop.first else '' }}">
+                  <div class="carousel-content">
+                    <div class="carousel-figure">
+                      <a href="{{ url_for('book_detail', book_id=book.id) }}">
+                        <img src="{{ (book.image and url_for('static', filename='uploads/' ~ book.image)) or (book.cover_url) or url_for('static', filename='placeholder.jpg') }}"
+                             alt="{{ book.title }}"
+                             loading="eager"
+                             onerror="this.onerror=null;this.src='{{ url_for('static', filename='placeholder.jpg') }}'">
+                      </a>
+                    </div>
+                    <div class="carousel-card">
+                      <h3 class="book-title">{{ book.title }}</h3>
+                      <p class="book-meta">{{ book.author }}{% if book.genre %} • {{ book.genre }}{% endif %}</p>
+                      <p class="book-desc">{{ (book.description or '')[:160] }}{% if (book.description or '')|length > 160 %}...{% endif %}</p>
+                      <div class="book-actions">
+                        <a class="btn primary" href="{{ url_for('book_detail', book_id=book.id) }}">Đọc chi tiết</a>
+                        <a class="btn secondary" href="{{ url_for('books_list', genre=book.genre) }}">Xem cùng thể loại</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+          {% endfor %}
+      {% else %}
+          <div class="carousel-item active">
+              <div class="carousel-content">
+                <div class="carousel-figure">
+                  <img src="{{ url_for('static', filename='images/sample-1.jpg') }}" alt="Sample Book">
+                </div>
+                <div class="carousel-card">
+                  <h3 class="book-title">Sách mẫu</h3>
+                  <p class="book-meta">Tác giả mẫu • Thể loại</p>
+                  <p class="book-desc">Mô tả ngắn: nội dung giới thiệu ngắn gọn để minh họa bố cục hiển thị.</p>
+                  <div class="book-actions">
+                    <a class="btn primary" href="{{ url_for('books_list') }}">Khám phá thêm</a>
+                  </div>
+                </div>
+              </div>
+          </div>
+      {% endif %}
+
+  </div>
+
+  <button class="carousel-control-prev" type="button" data-bs-target="#bookCarousel" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Trước</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#bookCarousel" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Sau</span>
+  </button>
+</div>
+
+
+<!-- Hero Stats -->
+<section class="hero-stats">
+  <div class="stats-container">
+    <div class="stat-item">
+      <div class="stat-number">{{ latest_books|length }}+</div>
+      <div class="stat-label">Sách mới</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">{{ genres|length }}+</div>
+      <div class="stat-label">Thể loại</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">100+</div>
+      <div class="stat-label">Review</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">24/7</div>
+      <div class="stat-label">Hỗ trợ</div>
+    </div>
+  </div>
+</section>
+
+{% if latest_books %}
+<section class="featured-section">
+  <div class="section-header">
+    <h2 class="section-title">Sách mới cập nhật</h2>
+    <p class="section-subtitle">Khám phá những cuốn sách mới nhất được thêm vào thư viện</p>
+  </div>
+  <div class="grid">
+    {% for b in latest_books %}
+    <a class="card" href="{{ url_for('book_detail', book_id=b.id) }}" style="animation-delay: {{ loop.index0 * 0.1 }}s">
+      <div class="cover">
+        <img src="{{ b.cover_url or url_for('static', filename='placeholder.jpg') }}" alt="{{ b.title }}" loading="lazy">
+        <div class="cover-overlay">
+          <div class="book-genre">{{ b.genre }}</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <h3 class="book-title">{{ b.title }}</h3>
+        <p class="book-author">{{ b.author }}</p>
+        <p class="book-desc">{{ (b.description or '')[:120] }}{% if (b.description or '')|length > 120 %}...{% endif %}</p>
+        <div class="book-meta">
+          <span class="book-code">#{{ b.book_code or 'N/A' }}</span>
+        </div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  <div class="section-footer">
+    <a class="btn btn-secondary" href="{{ url_for('books_list') }}">
+      <span>Xem tất cả sách</span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M5 12h14M12 5l7 7-7 7"/>
+      </svg>
+    </a>
+  </div>
+</section>
+{% endif %}
+
+{% if genres %}
+<section class="categories-section">
+  <div class="section-header">
+    <h2 class="section-title">Thể loại sách</h2>
+    <p class="section-subtitle">Tìm kiếm sách theo sở thích và thể loại yêu thích của bạn</p>
+  </div>
+  <div class="categories-grid">
+    {% for g in genres %}
+      <a class="category-card" href="{{ url_for('books_list', genre=g) }}">
+        <div class="category-icon">
+          {% if g == 'Tiểu thuyết' %}
+            📚
+          {% elif g == 'Kinh tế' %}
+            💼
+          {% elif g == 'Khoa học' %}
+            🔬
+          {% elif g == 'Tâm lý' %}
+            🧠
+          {% elif g == 'Thiếu nhi' %}
+            🎈
+          {% elif g == 'Lịch sử' %}
+            🏛️
+          {% elif g == 'Văn học' %}
+            ✍️
+          {% else %}
+            📖
+          {% endif %}
+        </div>
+        <div class="category-name">{{ g }}</div>
+      </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% if top_week %}
+<section class="featured-section">
+  <div class="section-header">
+    <h2 class="section-title">Top tuần</h2>
+    <p class="section-subtitle">Sách được review nhiều trong 7 ngày qua</p>
+  </div>
+  <div class="grid">
+    {% for b in top_week %}
+    <a class="card" href="{{ url_for('book_detail', book_id=b.id) }}" style="animation-delay: {{ loop.index0 * 0.1 }}s">
+      <div class="cover">
+        <img src="{{ b.cover_url or url_for('static', filename='placeholder.jpg') }}" alt="{{ b.title }}" loading="lazy">
+        <div class="cover-overlay"><div class="book-genre">{{ b.genre }}</div></div>
+      </div>
+      <div class="card-body">
+        <h3 class="book-title">{{ b.title }}</h3>
+        <p class="book-author">{{ b.author }}</p>
+        <p class="book-desc">{{ (b.description or '')[:120] }}{% if (b.description or '')|length > 120 %}...{% endif %}</p>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% if trending %}
+<section class="featured-section">
+  <div class="section-header">
+    <h2 class="section-title">⚡ Đang thịnh hành</h2>
+    <p class="section-subtitle">Kết hợp đánh giá cao, bookmark gần đây và sách mới - Được cập nhật thông minh</p>
+  </div>
+  <div class="grid">
+    {% for b in trending %}
+    <a class="card trending-card" href="{{ url_for('book_detail', book_id=b.id) }}" style="animation-delay: {{ loop.index0 * 0.1 }}s; position: relative;">
+      <div class="trending-badge" style="position: absolute; top: 8px; right: 8px; background: linear-gradient(45deg, #ff6b6b, #ee5a24); color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; z-index: 2; box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);">
+        ⚡ #{{ loop.index }}
+      </div>
+      <div class="cover">
+        <img src="{{ b.cover_url or url_for('static', filename='placeholder.jpg') }}" alt="{{ b.title }}" loading="lazy">
+        <div class="cover-overlay"><div class="book-genre">{{ b.genre }}</div></div>
+      </div>
+      <div class="card-body">
+        <h3 class="book-title">{{ b.title }}</h3>
+        <p class="book-author">{{ b.author }}</p>
+        <p class="book-desc">{{ (b.description or '')[:120] }}{% if (b.description or '')|length > 120 %}...{% endif %}</p>
+        <div class="trending-stats" style="display: flex; gap: 8px; margin-top: 8px; font-size: 12px; color: var(--muted);">
+          <span style="background: rgba(34, 197, 94, 0.1); color: var(--primary); padding: 2px 6px; border-radius: 8px;">⭐ Trending</span>
+        </div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% if not top_week and latest_books %}
+<section class="featured-section">
+  <div class="section-header">
+    <h2 class="section-title">Top tuần</h2>
+    <p class="section-subtitle">Chưa có đủ dữ liệu tuần này, hiển thị sách mới</p>
+  </div>
+  <div class="grid">
+    {% for b in latest_books[:8] %}
+    <a class="card" href="{{ url_for('book_detail', book_id=b.id) }}" style="animation-delay: {{ loop.index0 * 0.1 }}s">
+      <div class="cover">
+        <img src="{{ b.cover_url or url_for('static', filename='placeholder.jpg') }}" alt="{{ b.title }}" loading="lazy">
+        <div class="cover-overlay"><div class="book-genre">{{ b.genre }}</div></div>
+      </div>
+      <div class="card-body">
+        <h3 class="book-title">{{ b.title }}</h3>
+        <p class="book-author">{{ b.author }}</p>
+        <p class="book-desc">{{ (b.description or '')[:120] }}{% if (b.description or '')|length > 120 %}...{% endif %}</p>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% if not trending and latest_books %}
+<section class="featured-section">
+  <div class="section-header">
+    <h2 class="section-title">⚡ Đang thịnh hành</h2>
+    <p class="section-subtitle">Hiển thị sách mới nhất - Sẽ cập nhật khi có thêm dữ liệu</p>
+  </div>
+  <div class="grid">
+    {% for b in latest_books[:8] %}
+    <a class="card" href="{{ url_for('book_detail', book_id=b.id) }}" style="animation-delay: {{ loop.index0 * 0.1 }}s">
+      <div class="cover">
+        <img src="{{ b.cover_url or url_for('static', filename='placeholder.jpg') }}" alt="{{ b.title }}" loading="lazy">
+        <div class="cover-overlay"><div class="book-genre">{{ b.genre }}</div></div>
+      </div>
+      <div class="card-body">
+        <h3 class="book-title">{{ b.title }}</h3>
+        <p class="book-author">{{ b.author }}</p>
+        <p class="book-desc">{{ (b.description or '')[:120] }}{% if (b.description or '')|length > 120 %}...{% endif %}</p>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<!-- Enhanced Carousel JavaScript -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Carousel variables
+  let currentSlideIndex = 0;
+  let autoPlayInterval;
+  let isTransitioning = false;
+  const slides = document.querySelectorAll('.carousel-slide');
+  const indicators = document.querySelectorAll('.indicator');
+  const progressBar = document.querySelector('.progress-bar');
+  const totalSlides = slides.length;
+  const autoPlayDelay = 6000; // 6 seconds
+
+  // Check if carousel exists
+  if (totalSlides === 0) {
+    console.log('No carousel slides found');
+    return;
+  }
+
+  // Enhanced slide transition with animations
+  function showSlide(index) {
+    if (isTransitioning || index < 0 || index >= totalSlides) return;
+    isTransitioning = true;
+    
+    // Hide all slides with fade out
+    slides.forEach((slide, i) => {
+      slide.classList.remove('active');
+      if (i === index) {
+        slide.style.opacity = '0';
+        slide.style.transform = 'translateX(50px)';
+      }
+    });
+    
+    indicators.forEach(indicator => indicator.classList.remove('active'));
+    
+    // Show current slide with fade in
+    setTimeout(() => {
+      if (slides[index]) {
+        slides[index].classList.add('active');
+        slides[index].style.opacity = '1';
+        slides[index].style.transform = 'translateX(0)';
+        if (indicators[index]) {
+          indicators[index].classList.add('active');
+        }
+      }
+      
+      // Reset progress bar
+      resetProgressBar();
+      isTransitioning = false;
+    }, 300);
+  }
+
+  function changeSlide(direction) {
+    if (isTransitioning) return;
+    
+    currentSlideIndex += direction;
+    
+    if (currentSlideIndex >= totalSlides) {
+      currentSlideIndex = 0;
+    } else if (currentSlideIndex < 0) {
+      currentSlideIndex = totalSlides - 1;
+    }
+    
+    showSlide(currentSlideIndex);
+  }
+
+  function currentSlide(index) {
+    if (isTransitioning) return;
+    currentSlideIndex = index - 1;
+    showSlide(currentSlideIndex);
+  }
+
+  // Progress bar animation
+  function resetProgressBar() {
+    if (progressBar) {
+      progressBar.style.animation = 'none';
+      progressBar.offsetHeight; // Trigger reflow
+      progressBar.style.animation = `progress ${autoPlayDelay}ms linear`;
+    }
+  }
+
+  // Auto-play carousel with pause on hover
+  function startAutoPlay() {
+    if (autoPlayInterval) {
+      clearInterval(autoPlayInterval);
+    }
+    autoPlayInterval = setInterval(() => {
+      if (!isTransitioning) {
+        changeSlide(1);
+      }
+    }, autoPlayDelay);
+  }
+
+  function stopAutoPlay() {
+    if (autoPlayInterval) {
+      clearInterval(autoPlayInterval);
+      autoPlayInterval = null;
+    }
+  }
+
+  // Enhanced interactions
+  function addRippleEffect(element, event) {
+    const ripple = element.querySelector('.nav-ripple, .btn-ripple');
+    if (ripple) {
+      const rect = element.getBoundingClientRect();
+      const size = Math.max(rect.width, rect.height);
+      const x = event.clientX - rect.left - size / 2;
+      const y = event.clientY - rect.top - size / 2;
+      
+      ripple.style.width = ripple.style.height = size + 'px';
+      ripple.style.left = x + 'px';
+      ripple.style.top = y + 'px';
+      ripple.classList.add('ripple-active');
+      
+      setTimeout(() => {
+        ripple.classList.remove('ripple-active');
+      }, 600);
+    }
+  }
+
+  // Particle animation
+  function createParticles() {
+    const particlesContainer = document.querySelector('.bg-particles');
+    if (!particlesContainer) return;
+    
+    // Clear existing particles
+    particlesContainer.innerHTML = '';
+    
+    for (let i = 0; i < 30; i++) {
+      const particle = document.createElement('div');
+      particle.className = 'particle';
+      particle.style.left = Math.random() * 100 + '%';
+      particle.style.animationDelay = Math.random() * 20 + 's';
+      particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+      particlesContainer.appendChild(particle);
+    }
+  }
+
+  // Mark carousel as JS enabled
+  const carouselSlides = document.querySelector('.carousel-slides');
+  if (carouselSlides) {
+    carouselSlides.classList.add('js-enabled');
+  }
+
+  // Initialize carousel
+  showSlide(0);
+  startAutoPlay();
+  createParticles();
+  
+  // Add hover effects to navigation buttons
+  const navButtons = document.querySelectorAll('.carousel-nav');
+  navButtons.forEach(button => {
+    button.addEventListener('click', (e) => {
+      e.preventDefault();
+      addRippleEffect(button, e);
+    });
+    
+    button.addEventListener('mouseenter', () => {
+      stopAutoPlay();
+    });
+    
+    button.addEventListener('mouseleave', () => {
+      startAutoPlay();
+    });
+  });
+  
+  // Add hover effects to action buttons
+  const actionButtons = document.querySelectorAll('.btn');
+  actionButtons.forEach(button => {
+    button.addEventListener('click', (e) => {
+      addRippleEffect(button, e);
+    });
+  });
+  
+  // Pause auto-play on carousel hover
+  const carousel = document.querySelector('.carousel-wrapper');
+  if (carousel) {
+    carousel.addEventListener('mouseenter', stopAutoPlay);
+    carousel.addEventListener('mouseleave', startAutoPlay);
+  }
+  
+  // Add keyboard navigation
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      changeSlide(-1);
+    } else if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      changeSlide(1);
+    }
+  });
+  
+  // Add touch/swipe support
+  let touchStartX = 0;
+  let touchEndX = 0;
+  
+  if (carousel) {
+    carousel.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    });
+    
+    carousel.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      handleSwipe();
+    });
+  }
+  
+  function handleSwipe() {
+    const swipeThreshold = 50;
+    const diff = touchStartX - touchEndX;
+    
+    if (Math.abs(diff) > swipeThreshold) {
+      if (diff > 0) {
+        changeSlide(1); // Swipe left - next slide
+      } else {
+        changeSlide(-1); // Swipe right - previous slide
+      }
+    }
+  }
+
+  // Intersection Observer for animations
+  const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('animate-in');
+      }
+    });
+  }, observerOptions);
+
+  // Observe feature items for staggered animation
+  const featureItems = document.querySelectorAll('.feature-item');
+  featureItems.forEach((item, index) => {
+    item.style.animationDelay = `${index * 0.1}s`;
+    observer.observe(item);
+  });
+
+  // Cleanup on page unload
+  window.addEventListener('beforeunload', () => {
+    stopAutoPlay();
+  });
+});
+
+// Dynamic Product Promotion Carousel JavaScript 🎠
+document.addEventListener('DOMContentLoaded', function() {
+  const carousel = document.getElementById('promotionCarousel');
+  let slides = Array.from(document.querySelectorAll('.promotion-slide'));
+  const prevBtn = document.querySelector('.prev-btn');
+  const nextBtn = document.querySelector('.next-btn');
+  const progressFill = document.querySelector('.progress-fill');
+  const currentSlideSpan = document.querySelector('.current-slide');
+  const totalSlidesSpan = document.querySelector('.total-slides');
+  const indicatorsContainer = document.querySelector('.slide-indicators');
+  
+  if (!carousel || !slides.length) return;
+  
+  let currentSlideIndex = 0;
+  let autoPlayInterval;
+  let isTransitioning = false;
+  
+  // Initialize carousel
+  function initCarousel() {
+    // If only one slide exists, duplicate it to avoid blank state on navigation
+    if (slides.length === 1 && carousel) {
+      const clone = slides[0].cloneNode(true);
+      clone.classList.remove('active');
+      clone.setAttribute('data-slide', '2');
+      carousel.appendChild(clone);
+      slides = Array.from(document.querySelectorAll('.promotion-slide'));
+    }
+
+    // Ensure one slide active at start
+    if (!slides.some(s => s.classList.contains('active')) && slides[0]) {
+      slides[0].classList.add('active');
+    }
+
+    // Rebuild indicators to match slides length
+    rebuildIndicators();
+    totalSlidesSpan.textContent = slides.length;
+    updateProgress();
+    startAutoPlay();
+    
+    // Add event listeners
+    if (prevBtn) prevBtn.addEventListener('click', () => changeSlide(-1));
+    if (nextBtn) nextBtn.addEventListener('click', () => changeSlide(1));
+    
+    // Add keyboard navigation
+    document.addEventListener('keydown', handleKeydown);
+    
+    // Add touch/swipe support
+    let startX = 0;
+    let endX = 0;
+    
+    carousel.addEventListener('touchstart', (e) => {
+      startX = e.touches[0].clientX;
+    });
+    
+    carousel.addEventListener('touchend', (e) => {
+      endX = e.changedTouches[0].clientX;
+      handleSwipe();
+    });
+    
+    function handleSwipe() {
+      const threshold = 50;
+      const diff = startX - endX;
+      
+      if (Math.abs(diff) > threshold) {
+        if (diff > 0) {
+          changeSlide(1); // Swipe left - next slide
+        } else {
+          changeSlide(-1); // Swipe right - previous slide
+        }
+      }
+    }
+    
+    // Add hover effects
+    carousel.addEventListener('mouseenter', stopAutoPlay);
+    carousel.addEventListener('mouseleave', startAutoPlay);
+  }
+
+  // Rebuild indicators based on actual slides count
+  function rebuildIndicators() {
+    if (!indicatorsContainer) return;
+    indicatorsContainer.innerHTML = '';
+    slides.forEach((_, index) => {
+      const btn = document.createElement('button');
+      btn.className = 'indicator' + (index === 0 ? ' active' : '');
+      btn.setAttribute('onclick', `goToSlide(${index + 1})`);
+      btn.innerHTML = '<div class="indicator-dot"></div><div class="indicator-pulse"></div>';
+      indicatorsContainer.appendChild(btn);
+    });
+  }
+  
+  // Change slide function
+  function changeSlide(direction) {
+    if (isTransitioning) return;
+    
+    isTransitioning = true;
+    stopAutoPlay();
+    
+    // Remove active class from current slide
+    const indicators = document.querySelectorAll('.indicator');
+    if (slides[currentSlideIndex]) slides[currentSlideIndex].classList.remove('active');
+    if (indicators[currentSlideIndex]) indicators[currentSlideIndex].classList.remove('active');
+    
+    // Calculate new slide index
+    currentSlideIndex += direction;
+    
+    if (currentSlideIndex >= slides.length) {
+      currentSlideIndex = 0;
+    } else if (currentSlideIndex < 0) {
+      currentSlideIndex = slides.length - 1;
+    }
+    
+    // Add active class to new slide
+    slides[currentSlideIndex].classList.add('active');
+    const indicators2 = document.querySelectorAll('.indicator');
+    if (indicators2[currentSlideIndex]) indicators2[currentSlideIndex].classList.add('active');
+    
+    // Update progress and counter
+    updateProgress();
+    currentSlideSpan.textContent = currentSlideIndex + 1;
+    
+    // Add ripple effect to buttons
+    addRippleEffect(direction === 1 ? nextBtn : prevBtn);
+    
+    // Reset transition flag
+    setTimeout(() => {
+      isTransitioning = false;
+      startAutoPlay();
+    }, 800);
+  }
+  
+  // Go to specific slide
+  function goToSlide(slideIndex) {
+    if (isTransitioning || slideIndex === currentSlideIndex + 1) return;
+    
+    isTransitioning = true;
+    stopAutoPlay();
+    
+    // Remove active class from current slide
+    const indicators = document.querySelectorAll('.indicator');
+    if (slides[currentSlideIndex]) slides[currentSlideIndex].classList.remove('active');
+    if (indicators[currentSlideIndex]) indicators[currentSlideIndex].classList.remove('active');
+    
+    // Set new slide index
+    currentSlideIndex = slideIndex - 1;
+    
+    // Add active class to new slide
+    slides[currentSlideIndex].classList.add('active');
+    const indicators2 = document.querySelectorAll('.indicator');
+    if (indicators2[currentSlideIndex]) indicators2[currentSlideIndex].classList.add('active');
+    
+    // Update progress and counter
+    updateProgress();
+    currentSlideSpan.textContent = currentSlideIndex + 1;
+    
+    // Reset transition flag
+    setTimeout(() => {
+      isTransitioning = false;
+      startAutoPlay();
+    }, 800);
+  }
+  
+  // Update progress bar
+  function updateProgress() {
+    const progress = ((currentSlideIndex + 1) / slides.length) * 100;
+    progressFill.style.width = progress + '%';
+  }
+  
+  // Auto play functions
+  function startAutoPlay() {
+    stopAutoPlay();
+    autoPlayInterval = setInterval(() => {
+      changeSlide(1);
+    }, 5000);
+  }
+  
+  function stopAutoPlay() {
+    if (autoPlayInterval) {
+      clearInterval(autoPlayInterval);
+      autoPlayInterval = null;
+    }
+  }
+  
+  // Keyboard navigation
+  function handleKeydown(e) {
+    if (e.key === 'ArrowLeft') {
+      changeSlide(-1);
+    } else if (e.key === 'ArrowRight') {
+      changeSlide(1);
+    }
+  }
+  
+  // Ripple effect for buttons
+  function addRippleEffect(button) {
+    if (!button) return;
+    
+    const ripple = button.querySelector('.control-ripple');
+    if (ripple) {
+      ripple.style.animation = 'none';
+      ripple.offsetHeight; // Trigger reflow
+      ripple.style.animation = 'ripple 0.6s linear';
+    }
+  }
+  
+  // Add ripple effect to action buttons
+  document.querySelectorAll('.btn-primary, .btn-secondary').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      const ripple = this.querySelector('.btn-ripple');
+      if (ripple) {
+        const rect = this.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        const x = e.clientX - rect.left - size / 2;
+        const y = e.clientY - rect.top - size / 2;
+        
+        ripple.style.width = ripple.style.height = size + 'px';
+        ripple.style.left = x + 'px';
+        ripple.style.top = y + 'px';
+        ripple.style.animation = 'ripple 0.6s linear';
+      }
+    });
+  });
+  
+  // Add hover effects to feature cards
+  document.querySelectorAll('.feature-card').forEach(card => {
+    card.addEventListener('mouseenter', function() {
+      this.style.transform = 'translateY(-5px) scale(1.02)';
+    });
+    
+    card.addEventListener('mouseleave', function() {
+      this.style.transform = 'translateY(0) scale(1)';
+    });
+  });
+  
+  // Add intersection observer for animations
+  const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+  };
+  
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, observerOptions);
+  
+  // Observe elements for animation
+  document.querySelectorAll('.feature-card, .offer-banner, .product-actions').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(20px)';
+    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    observer.observe(el);
+  });
+  
+  // Initialize carousel
+  initCarousel();
+  
+  // Make functions globally available
+  window.changeSlide = changeSlide;
+  window.goToSlide = goToSlide;
+});
+
+// Add CSS animations dynamically
+const style = document.createElement('style');
+style.textContent = `
+  .promotion-slide {
+    will-change: transform, opacity;
+  }
+  
+  .feature-card {
+    will-change: transform;
+  }
+  
+  .btn-primary, .btn-secondary {
+    will-change: transform;
+  }
+  
+  .control-btn {
+    will-change: transform;
+  }
+  
+  .indicator {
+    will-change: transform;
+  }
+`;
+document.head.appendChild(style);
+</script>
+
+{% endblock %}
+
+<script>
+// Simple Carousel logic for #bookCarousel (no external dependency)
+document.addEventListener('DOMContentLoaded', function() {
+  const root = document.getElementById('bookCarousel');
+  if (!root) return;
+  const items = Array.from(root.querySelectorAll('.carousel-item'));
+  if (items.length === 0) return;
+  let index = items.findIndex(i => i.classList.contains('active'));
+  if (index < 0) { index = 0; items[0].classList.add('active'); }
+
+  const show = (i) => {
+    items.forEach(el => el.classList.remove('active'));
+    items[i].classList.add('active');
+    index = i;
+  };
+
+  const next = () => show((index + 1) % items.length);
+  const prev = () => show((index - 1 + items.length) % items.length);
+
+  const btnPrev = root.querySelector('.carousel-control-prev');
+  const btnNext = root.querySelector('.carousel-control-next');
+  if (btnPrev) btnPrev.addEventListener('click', (e) => { e.preventDefault(); prev(); reset(); });
+  if (btnNext) btnNext.addEventListener('click', (e) => { e.preventDefault(); next(); reset(); });
+
+  let timer = null;
+  const start = () => { timer = setInterval(next, 5000); };
+  const stop = () => { if (timer) { clearInterval(timer); timer = null; } };
+  const reset = () => { stop(); start(); };
+
+  root.addEventListener('mouseenter', stop);
+  root.addEventListener('mouseleave', start);
+  start();
+});
+</script>

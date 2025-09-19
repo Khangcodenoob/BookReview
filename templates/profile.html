@@ -1,0 +1,384 @@
+{% extends 'base.html' %}
+{% block title %}Hồ sơ - {{ user.username }}{% endblock %}
+{% block content %}
+
+<!-- Profile Header -->
+<div class="profile-header" style="background: linear-gradient(135deg, var(--primary), var(--accent)); color: #06210e; padding: 40px 0; margin: -20px -20px 30px -20px; border-radius: 0 0 20px 20px; position: relative; overflow: hidden;">
+  <div class="profile-header-bg" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(45deg, rgba(255,255,255,0.1) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.1) 75%), linear-gradient(45deg, rgba(255,255,255,0.1) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.1) 75%); background-size: 20px 20px; background-position: 0 0, 10px 10px; opacity: 0.3;"></div>
+  
+  <div class="container" style="position: relative; z-index: 1;">
+    <div class="profile-info" style="display: flex; align-items: center; gap: 24px; flex-wrap: wrap;">
+      <!-- Avatar Section -->
+      <div class="avatar-section" style="position: relative;">
+        <div class="avatar-container" style="width: 120px; height: 120px; border-radius: 50%; overflow: hidden; border: 4px solid rgba(255,255,255,0.3); background: var(--panel); display: flex; align-items: center; justify-content: center; position: relative; box-shadow: 0 8px 32px rgba(0,0,0,0.2);">
+    {% if current_user.avatar_url %}
+            <img src="{{ current_user.avatar_url }}" alt="avatar" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+    {% else %}
+            <div style="color: var(--muted); font-size: 48px; font-weight: 300;">👤</div>
+          {% endif %}
+        </div>
+        <div class="avatar-actions" style="position: absolute; bottom: -35px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px;">
+          <button class="avatar-btn" onclick="document.getElementById('avatar-upload').click()" style="width: 32px; height: 32px; background: var(--accent); border: none; border-radius: 50%; color: #06210e; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); transition: all 0.2s;" title="Tải avatar lên">
+            📷
+          </button>
+          {% if current_user.avatar_url %}
+          <button class="avatar-btn" onclick="deleteAvatar()" style="width: 32px; height: 32px; background: #ef4444; border: none; border-radius: 50%; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); transition: all 0.2s;" title="Xóa avatar">
+            🗑️
+          </button>
+    {% endif %}
+  </div>
+      </div>
+
+      <!-- User Info -->
+      <div class="user-details" style="flex: 1; min-width: 200px;">
+        <h1 style="margin: 0 0 8px 0; font-size: 32px; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.1);">{{ user.username }}</h1>
+        <div class="user-badges" style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
+          <span class="role-badge" style="background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+            {{ user.role }}
+          </span>
+          <span class="member-badge" style="background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">
+            📚 Thành viên
+          </span>
+        </div>
+        <div class="user-stats" style="display: flex; gap: 24px; margin-top: 16px;">
+          <div class="stat-item" style="text-align: center;">
+            <div class="stat-number" style="font-size: 24px; font-weight: 700; margin-bottom: 4px;">{{ bookmarks|length }}</div>
+            <div class="stat-label" style="font-size: 12px; opacity: 0.8;">Sách đã lưu</div>
+          </div>
+          <div class="stat-item" style="text-align: center;">
+            <div class="stat-number" style="font-size: 24px; font-weight: 700; margin-bottom: 4px;">{{ my_reviews|length }}</div>
+            <div class="stat-label" style="font-size: 12px; opacity: 0.8;">Đánh giá</div>
+          </div>
+          <div class="stat-item" style="text-align: center;">
+            <div class="stat-number" style="font-size: 24px; font-weight: 700; margin-bottom: 4px;">{{ (my_reviews|sum(attribute='rating') / my_reviews|length if my_reviews else 0)|round(1) }}</div>
+            <div class="stat-label" style="font-size: 12px; opacity: 0.8;">Điểm TB</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Hidden Avatar Upload Form -->
+<form id="avatar-form" method="post" action="{{ url_for('upload_avatar') }}" enctype="multipart/form-data" style="display: none;">
+  <input id="avatar-upload" type="file" name="avatar" accept="image/*" onchange="uploadAvatar()">
+    </form>
+
+<!-- Profile Navigation -->
+<div class="profile-nav" style="margin-bottom: 30px;">
+  <div class="nav-tabs" style="display: flex; gap: 4px; background: var(--panel); padding: 4px; border-radius: 12px; border: 1px solid var(--border);">
+    <button class="nav-tab active" data-tab="bookmarks" style="flex: 1; padding: 12px 16px; border: none; background: var(--primary); color: #06210e; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+      📚 Sách đã lưu
+    </button>
+    <button class="nav-tab" data-tab="reviews" style="flex: 1; padding: 12px 16px; border: none; background: transparent; color: var(--text); border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+      ⭐ Đánh giá
+    </button>
+    <button class="nav-tab" data-tab="activity" style="flex: 1; padding: 12px 16px; border: none; background: transparent; color: var(--text); border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+      📊 Hoạt động
+    </button>
+  </div>
+</div>
+
+<!-- Tab Content -->
+<div class="tab-content">
+  <!-- Bookmarks Tab -->
+  <div id="bookmarks-tab" class="tab-panel active">
+    <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <h2 style="margin: 0; color: var(--text);">📚 Sách đã lưu</h2>
+      <div class="view-controls" style="display: flex; gap: 8px;">
+        <button class="view-btn active" data-view="grid" style="padding: 8px 12px; border: 1px solid var(--border); background: var(--primary); color: #06210e; border-radius: 6px; cursor: pointer; font-size: 12px;">
+          ⊞ Lưới
+        </button>
+        <button class="view-btn" data-view="list" style="padding: 8px 12px; border: 1px solid var(--border); background: transparent; color: var(--text); border-radius: 6px; cursor: pointer; font-size: 12px;">
+          ☰ Danh sách
+        </button>
+      </div>
+    </div>
+    
+    <div id="bookmarks-grid" class="bookmarks-container grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;">
+    {% for b in bookmarks %}
+      <div class="bookmark-card" style="background: var(--panel); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; transition: all 0.2s; position: relative;">
+        <a href="{{ url_for('book_detail', book_id=b.id) }}" style="text-decoration: none; color: inherit;">
+          <div class="bookmark-cover" style="position: relative; aspect-ratio: 2/3; overflow: hidden;">
+            <img src="{{ b.cover_url or url_for('static', filename='placeholder.jpg') }}" alt="{{ b.title }}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.2s;">
+            <div class="bookmark-overlay" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.7)); opacity: 0; transition: opacity 0.2s;"></div>
+            <div class="bookmark-actions" style="position: absolute; top: 8px; right: 8px; display: flex; gap: 4px; opacity: 0; transition: opacity 0.2s;">
+              <button class="action-btn" onclick="event.preventDefault(); removeBookmark({{ b.id }})" style="width: 28px; height: 28px; background: rgba(0,0,0,0.7); border: none; border-radius: 50%; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px;">
+                ❤️
+              </button>
+            </div>
+          </div>
+          <div class="bookmark-info" style="padding: 16px;">
+            <h3 style="margin: 0 0 8px 0; font-size: 16px; font-weight: 600; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ b.title }}</h3>
+            <p style="margin: 0 0 8px 0; color: var(--muted); font-size: 14px;">{{ b.author }}</p>
+            {% if b.genre %}
+            <span class="genre-tag" style="background: var(--primary); color: #06210e; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 500;">{{ b.genre }}</span>
+            {% endif %}
+          </div>
+        </a>
+      </div>
+      {% else %}
+      <div class="empty-state" style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--muted);">
+        <div style="font-size: 48px; margin-bottom: 16px;">📚</div>
+        <h3 style="margin: 0 0 8px 0; color: var(--text);">Chưa có sách nào được lưu</h3>
+        <p style="margin: 0;">Hãy khám phá và lưu những cuốn sách yêu thích của bạn!</p>
+        <a href="{{ url_for('books_list') }}" class="btn" style="margin-top: 16px; display: inline-block;">Khám phá sách</a>
+      </div>
+    {% endfor %}
+    </div>
+  </div>
+
+  <!-- Reviews Tab -->
+  <div id="reviews-tab" class="tab-panel" style="display: none;">
+    <div class="section-header" style="margin-bottom: 20px;">
+      <h2 style="margin: 0; color: var(--text);">⭐ Đánh giá của bạn</h2>
+    </div>
+    
+    <div class="reviews-container">
+    {% for r in my_reviews %}
+      <div class="review-card" style="background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 16px; transition: all 0.2s;">
+        <div class="review-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+          <div>
+            <h3 style="margin: 0 0 4px 0; font-size: 18px; font-weight: 600;">
+              <a href="{{ url_for('book_detail', book_id=r.book_id) }}" style="color: var(--text); text-decoration: none;">{{ r.book_title }}</a>
+            </h3>
+            <p style="margin: 0; color: var(--muted); font-size: 14px;">{{ r.created_at.strftime('%d/%m/%Y') }}</p>
+          </div>
+          <div class="review-rating" style="display: flex; align-items: center; gap: 8px;">
+            <div class="stars" style="color: #fbbf24; font-size: 18px;">{{ '★' * r.rating }}{{ '☆' * (5 - r.rating) }}</div>
+            <span style="font-weight: 600; color: var(--text);">{{ r.rating }}/5</span>
+          </div>
+        </div>
+        {% if r.comment %}
+        <div class="review-content" style="color: var(--text); line-height: 1.5; margin-bottom: 12px;">
+          {{ r.comment }}
+        </div>
+        {% endif %}
+        <div class="review-actions" style="display: flex; gap: 8px;">
+          <button class="action-btn" onclick="editReview({{ r.id }})" style="padding: 6px 12px; border: 1px solid var(--border); background: transparent; color: var(--text); border-radius: 6px; cursor: pointer; font-size: 12px;">
+            ✏️ Chỉnh sửa
+          </button>
+          <button class="action-btn" onclick="deleteReview({{ r.id }})" style="padding: 6px 12px; border: 1px solid #ef4444; background: transparent; color: #ef4444; border-radius: 6px; cursor: pointer; font-size: 12px;">
+            🗑️ Xóa
+          </button>
+        </div>
+      </div>
+    {% else %}
+      <div class="empty-state" style="text-align: center; padding: 60px 20px; color: var(--muted);">
+        <div style="font-size: 48px; margin-bottom: 16px;">⭐</div>
+        <h3 style="margin: 0 0 8px 0; color: var(--text);">Chưa có đánh giá nào</h3>
+        <p style="margin: 0;">Hãy đọc sách và chia sẻ đánh giá của bạn!</p>
+        <a href="{{ url_for('books_list') }}" class="btn" style="margin-top: 16px; display: inline-block;">Khám phá sách</a>
+      </div>
+    {% endfor %}
+    </div>
+  </div>
+
+  <!-- Activity Tab -->
+  <div id="activity-tab" class="tab-panel" style="display: none;">
+    <div class="section-header" style="margin-bottom: 20px;">
+      <h2 style="margin: 0; color: var(--text);">📊 Hoạt động gần đây</h2>
+    </div>
+    
+    <div class="activity-container">
+      <div class="activity-card" style="background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 16px;">
+        <div class="activity-header" style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+          <div style="width: 40px; height: 40px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #06210e; font-size: 18px;">
+            📚
+          </div>
+          <div>
+            <h3 style="margin: 0; font-size: 16px; font-weight: 600;">Thống kê đọc sách</h3>
+            <p style="margin: 0; color: var(--muted); font-size: 14px;">Tổng quan hoạt động của bạn</p>
+          </div>
+        </div>
+        
+        <div class="activity-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px;">
+          <div class="stat-card" style="text-align: center; padding: 16px; background: var(--bg); border-radius: 8px;">
+            <div style="font-size: 24px; font-weight: 700; color: var(--primary); margin-bottom: 4px;">{{ bookmarks|length }}</div>
+            <div style="font-size: 12px; color: var(--muted);">Sách đã lưu</div>
+          </div>
+          <div class="stat-card" style="text-align: center; padding: 16px; background: var(--bg); border-radius: 8px;">
+            <div style="font-size: 24px; font-weight: 700; color: var(--accent); margin-bottom: 4px;">{{ my_reviews|length }}</div>
+            <div style="font-size: 12px; color: var(--muted);">Đánh giá đã viết</div>
+          </div>
+          <div class="stat-card" style="text-align: center; padding: 16px; background: var(--bg); border-radius: 8px;">
+            <div style="font-size: 24px; font-weight: 700; color: #10b981; margin-bottom: 4px;">{{ (my_reviews|sum(attribute='rating') / my_reviews|length if my_reviews else 0)|round(1) }}</div>
+            <div style="font-size: 12px; color: var(--muted);">Điểm trung bình</div>
+          </div>
+          <div class="stat-card" style="text-align: center; padding: 16px; background: var(--bg); border-radius: 8px;">
+            <div style="font-size: 24px; font-weight: 700; color: #f59e0b; margin-bottom: 4px;">{{ (my_reviews|selectattr('rating', 'equalto', 5)|list|length) }}</div>
+            <div style="font-size: 12px; color: var(--muted);">Đánh giá 5 sao</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="activity-card" style="background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px;">
+        <div class="activity-header" style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+          <div style="width: 40px; height: 40px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #06210e; font-size: 18px;">
+            🎯
+          </div>
+          <div>
+            <h3 style="margin: 0; font-size: 16px; font-weight: 600;">Mục tiêu đọc sách</h3>
+            <p style="margin: 0; color: var(--muted); font-size: 14px;">Thiết lập và theo dõi mục tiêu</p>
+          </div>
+        </div>
+        
+        <div class="goals-container" style="display: flex; flex-direction: column; gap: 12px;">
+          <div class="goal-item" style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: var(--bg); border-radius: 8px;">
+            <div>
+              <div style="font-weight: 600; margin-bottom: 4px;">Đọc 12 cuốn sách trong năm</div>
+              <div style="font-size: 12px; color: var(--muted);">Tiến độ: {{ bookmarks|length }}/12</div>
+            </div>
+            <div style="width: 60px; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden;">
+              <div style="width: {{ (bookmarks|length / 12 * 100)|round(1) }}%; height: 100%; background: var(--primary); transition: width 0.3s;"></div>
+            </div>
+          </div>
+          
+          <div class="goal-item" style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: var(--bg); border-radius: 8px;">
+            <div>
+              <div style="font-weight: 600; margin-bottom: 4px;">Viết 10 đánh giá</div>
+              <div style="font-size: 12px; color: var(--muted);">Tiến độ: {{ my_reviews|length }}/10</div>
+            </div>
+            <div style="width: 60px; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden;">
+              <div style="width: {{ (my_reviews|length / 10 * 100)|round(1) }}%; height: 100%; background: var(--accent); transition: width 0.3s;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Profile JavaScript functionality
+document.addEventListener('DOMContentLoaded', function() {
+  // Tab switching
+  const tabs = document.querySelectorAll('.nav-tab');
+  const panels = document.querySelectorAll('.tab-panel');
+  
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const targetTab = tab.getAttribute('data-tab');
+      
+      // Update tab buttons
+      tabs.forEach(t => {
+        t.classList.remove('active');
+        t.style.background = 'transparent';
+        t.style.color = 'var(--text)';
+      });
+      tab.classList.add('active');
+      tab.style.background = 'var(--primary)';
+      tab.style.color = '#06210e';
+      
+      // Update panels
+      panels.forEach(panel => {
+        panel.classList.remove('active');
+        panel.style.display = 'none';
+      });
+      document.getElementById(targetTab + '-tab').classList.add('active');
+      document.getElementById(targetTab + '-tab').style.display = 'block';
+    });
+  });
+  
+  // View controls for bookmarks
+  const viewBtns = document.querySelectorAll('.view-btn');
+  const bookmarksContainer = document.getElementById('bookmarks-grid');
+  
+  viewBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const view = btn.getAttribute('data-view');
+      
+      viewBtns.forEach(b => {
+        b.classList.remove('active');
+        b.style.background = 'transparent';
+        b.style.color = 'var(--text)';
+      });
+      btn.classList.add('active');
+      btn.style.background = 'var(--primary)';
+      btn.style.color = '#06210e';
+      
+      if (view === 'list') {
+        bookmarksContainer.style.gridTemplateColumns = '1fr';
+        bookmarksContainer.style.gap = '12px';
+      } else {
+        bookmarksContainer.style.gridTemplateColumns = 'repeat(auto-fill, minmax(200px, 1fr))';
+        bookmarksContainer.style.gap = '20px';
+      }
+    });
+  });
+  
+  // Hover effects for bookmark cards
+  const bookmarkCards = document.querySelectorAll('.bookmark-card');
+  bookmarkCards.forEach(card => {
+    card.addEventListener('mouseenter', () => {
+      const img = card.querySelector('img');
+      const overlay = card.querySelector('.bookmark-overlay');
+      const actions = card.querySelector('.bookmark-actions');
+      
+      if (img) img.style.transform = 'scale(1.05)';
+      if (overlay) overlay.style.opacity = '1';
+      if (actions) actions.style.opacity = '1';
+    });
+    
+    card.addEventListener('mouseleave', () => {
+      const img = card.querySelector('img');
+      const overlay = card.querySelector('.bookmark-overlay');
+      const actions = card.querySelector('.bookmark-actions');
+      
+      if (img) img.style.transform = 'scale(1)';
+      if (overlay) overlay.style.opacity = '0';
+      if (actions) actions.style.opacity = '0';
+    });
+  });
+});
+
+// Avatar functions
+function uploadAvatar() {
+  const form = document.getElementById('avatar-form');
+  const fileInput = document.getElementById('avatar-upload');
+  
+  if (fileInput.files.length > 0) {
+    // Show loading state
+    const btn = document.querySelector('.avatar-btn');
+    btn.style.opacity = '0.6';
+    btn.textContent = '⏳';
+    
+    form.submit();
+  }
+}
+
+function deleteAvatar() {
+  if (confirm('Bạn có chắc muốn xóa avatar?')) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '{{ url_for("delete_avatar") }}';
+    document.body.appendChild(form);
+    form.submit();
+  }
+}
+
+// Bookmark functions
+function removeBookmark(bookId) {
+  if (confirm('Bạn có chắc muốn bỏ lưu sách này?')) {
+    // Implement bookmark removal
+    console.log('Remove bookmark:', bookId);
+  }
+}
+
+// Review functions
+function editReview(reviewId) {
+  // Implement review editing
+  console.log('Edit review:', reviewId);
+}
+
+function deleteReview(reviewId) {
+  if (confirm('Bạn có chắc muốn xóa đánh giá này?')) {
+    // Implement review deletion
+    console.log('Delete review:', reviewId);
+  }
+}
+</script>
+
+{% endblock %}
+
+

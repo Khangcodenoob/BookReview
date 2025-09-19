@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% block title %}{{ book.title }} - Chi tiết{% endblock %}
+{% block content %}
+<article class="book-detail">
+  <div class="book-header">
+    <img src="{{ book.cover_url or url_for('static', filename='placeholder.jpg') }}" alt="{{ book.title }}" class="book-cover">
+    <div>
+      <h2>{{ book.title }}</h2>
+      <p class="muted">{{ book.author }}</p>
+      <p class="muted" style="margin:4px 0">#{{ book.genre or 'Khác' }} {% if book.book_code %} · Mã: {{ book.book_code }}{% endif %}</p>
+      {% if tags %}
+      <p class="muted" style="margin:4px 0">Tags:
+        {% for t in tags %}
+          <span class="chip" style="margin-right:6px">{{ t }}</span>
+        {% endfor %}
+      </p>
+      {% endif %}
+      <ul class="muted" style="list-style:none;padding:0;margin:8px 0;display:flex;gap:16px;flex-wrap:wrap">
+        {% if book.publisher %}<li>NXB: <strong>{{ book.publisher }}</strong></li>{% endif %}
+        {% if book.num_pages %}<li>Số trang: <strong>{{ book.num_pages }}</strong></li>{% endif %}
+      </ul>
+      {% if avg_rating %}
+      <div class="rating-badge"><span class="stars">★</span><strong>{{ avg_rating }}</strong><span class="muted">({{ total_reviews }})</span></div>
+      {% endif %}
+      <p>{{ book.description }}</p>
+      <p><a class="btn" href="{{ url_for('new_review', book_id=book.id) }}">Viết đánh giá</a></p>
+    </div>
+  </div>
+
+  <section>
+    <h3>Đánh giá</h3>
+    {% if reviews %}
+    <ul class="reviews">
+      {% for r in reviews %}
+      <li>
+        <div class="review-head" style="justify-content:space-between">
+          <div style="display:flex;align-items:center;gap:10px">
+            <strong>{{ r.reviewer }}</strong>
+            <span class="stars">{{ '★' * r.rating }}{{ '☆' * (5 - r.rating) }}</span>
+            <span class="muted">{{ r.created_at }}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <form method="post" action="{{ url_for('review_vote', review_id=r.id) }}">
+              <button class="btn secondary" type="submit">Hữu ích ({{ votes_map.get(r.id, 0) }})</button>
+            </form>
+            <form method="post" action="{{ url_for('review_report', review_id=r.id) }}" onsubmit="return confirm('Báo cáo review này?')">
+              <input type="hidden" name="reason" value="spam">
+              <button class="btn secondary" type="submit">Báo cáo</button>
+            </form>
+          </div>
+        </div>
+        <div class="review-content">
+          {{ render_markdown(r.content)|safe }}
+          {% if r.details %}
+          <div class="review-details" style="margin-top:10px;padding:12px;border:1px dashed var(--border);border-radius:8px;background:rgba(255,255,255,0.04)">
+            <strong>Ghi chú chi tiết:</strong>
+            <div style="margin-top:6px">{{ render_markdown(r.details)|safe }}</div>
+          </div>
+          {% endif %}
+        </div>
+        <div class="review-comments" style="margin-top:8px">
+          <form method="post" action="{{ url_for('review_comment_add', review_id=r.id) }}" class="form" style="grid-template-columns:1fr auto;align-items:end;max-width:680px">
+            <label>Thêm bình luận
+              <input name="content" placeholder="Viết bình luận...">
+            </label>
+            <button class="btn" type="submit">Gửi</button>
+          </form>
+          {% set items = comments_map.get(r.id, []) %}
+          {% if items %}
+          <ul class="reviews" style="margin-top:6px">
+            {% for c in items %}
+            <li>
+              <div class="review-head">
+                <strong>{{ c.author }}</strong>
+                <span class="muted">{{ c.created_at }}</span>
+              </div>
+              <p>{{ c.content }}</p>
+              <form method="post" action="{{ url_for('review_comment_add', review_id=r.id) }}" class="form" style="grid-template-columns:1fr auto;align-items:end;max-width:680px">
+                <input type="hidden" name="parent_id" value="{{ c.id }}">
+                <label>Phản hồi
+                  <input name="content" placeholder="Trả lời bình luận này...">
+                </label>
+                <button class="btn secondary" type="submit">Trả lời</button>
+              </form>
+            </li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+      <p>Chưa có đánh giá nào. Hãy là người đầu tiên!</p>
+    {% endif %}
+  </section>
+</article>
+{% endblock %}
+
+{% block scripts %}
+<script>window.__chat_seed_book_id = {{ book.id }};</script>
+{% endblock %}
+
+

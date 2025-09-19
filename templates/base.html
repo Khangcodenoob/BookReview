@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Book Review{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}" type="image/svg+xml">
+    <script>
+      (function(){
+        try{var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme', t);}catch(e){}
+      })();
+    </script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="container">
+            <a class="brand" href="{{ url_for('home') }}" style="display:flex;align-items:center;gap:8px">
+              <img src="{{ url_for('static', filename='logo.svg') }}" alt="Hybi Books" width="28" height="28" style="display:block">
+              <div>
+                <div style="font-size: 18px; font-weight: 700; color: var(--text);">Hybi Books</div>
+                <div style="font-size: 12px; color: var(--muted); font-weight: 500;">Khám phá thế giới sách</div>
+              </div>
+            </a>
+            <nav>
+                <form method="get" action="{{ url_for('books_list') }}">
+                  <div class="search-container">
+                    <input class="search-input" name="q" placeholder="Tìm kiếm sách yêu thích..." value="{{ request.args.get('q','') }}" onfocus="this.placeholder='Tìm sách, tác giả, thể loại...'" onblur="if(this.value==='') this.placeholder='Tìm kiếm sách yêu thích...'">
+                  </div>
+                  <button class="btn search-btn" type="submit">🔍 Tìm</button>
+                </form>
+                <a href="{{ url_for('home') }}">Trang chủ</a>
+                <a href="{{ url_for('books_list') }}">Sách</a>
+                {% if current_user.role == 'admin' %}
+                <a href="{{ url_for('admin_books') }}">Quản trị</a>
+                <a href="{{ url_for('admin_users') }}">Tài khoản</a>
+                <a href="{{ url_for('admin_reviews_queue') }}">Duyệt review</a>
+                {% endif %}
+                {% if current_user.id %}
+                  <a href="{{ url_for('profile') }}">Hồ sơ</a>
+                  <span class="user-info">
+                    <img src="{{ current_user.avatar_url or url_for('static', filename='placeholder.jpg') }}" alt="{{ current_user.username }}" class="user-avatar">
+                    <span class="muted">Xin chào, {{ current_user.username }}</span>
+                  </span>
+                  <a href="{{ url_for('logout') }}">Đăng xuất</a>
+                {% else %}
+                  <a href="{{ url_for('login') }}">Đăng nhập</a>
+                  <a href="{{ url_for('register') }}">Đăng ký</a>
+                {% endif %}
+                <button class="theme-toggle" onclick="(function(){
+                  var html=document.documentElement;var cur=html.getAttribute('data-theme')||'dark';
+                  var next=cur==='dark'?'light':'dark';html.setAttribute('data-theme',next);try{localStorage.setItem('theme',next)}catch(e){}
+                })()"></button>
+            </nav>
+        </div>
+    </header>
+    <div class="content-wrapper">
+      {% set active_genre = selected_genre if selected_genre is defined else request.args.get('genre','') %}
+      <div class="container" style="margin-top:6px">
+        <nav class="navbar" aria-label="Danh mục sách">
+          <a class="{{ 'active' if not active_genre else '' }}" href="{{ url_for('books_list') }}">Tất cả</a>
+          <a class="{{ 'active' if active_genre=='Tiểu thuyết' else '' }}" href="{{ url_for('books_list', genre='Tiểu thuyết') }}">Tiểu thuyết</a>
+          <a class="{{ 'active' if active_genre=='Truyện ngắn' else '' }}" href="{{ url_for('books_list', genre='Truyện ngắn') }}">Truyện ngắn</a>
+          <a class="{{ 'active' if active_genre=='Kinh tế' else '' }}" href="{{ url_for('books_list', genre='Kinh tế') }}">Kinh tế</a>
+          <a class="{{ 'active' if active_genre=='Văn học' else '' }}" href="{{ url_for('books_list', genre='Văn học') }}">Văn học</a>
+          <a class="{{ 'active' if active_genre=='Khoa học' else '' }}" href="{{ url_for('books_list', genre='Khoa học') }}">Khoa học</a>
+          <a class="{{ 'active' if active_genre=='Tâm lý' else '' }}" href="{{ url_for('books_list', genre='Tâm lý') }}">Tâm lý</a>
+          <a class="{{ 'active' if active_genre=='Thiếu nhi' else '' }}" href="{{ url_for('books_list', genre='Thiếu nhi') }}">Thiếu nhi</a>
+          <a class="{{ 'active' if active_genre=='Lịch sử' else '' }}" href="{{ url_for('books_list', genre='Lịch sử') }}">Lịch sử</a>
+          <a class="{{ 'active' if active_genre=='Khác' else '' }}" href="{{ url_for('books_list', genre='Khác') }}">Khác</a>
+        </nav>
+      </div>
+      <main class="container">
+          {% with messages = get_flashed_messages() %}
+              {% if messages %}
+                  <ul class="flash">
+                  {% for msg in messages %}
+                      <li>{{ msg }}</li>
+                  {% endfor %}
+                  </ul>
+              {% endif %}
+          {% endwith %}
+          {% block content %}{% endblock %}
+      </main>
+    </div>
+
+    <!-- Footer hoàn chỉnh -->
+    <footer class="footer">
+      <div class="footer-content">
+        <div class="footer-section">
+          <div class="footer-logo">
+            <img src="{{ url_for('static', filename='logo.svg') }}" alt="Hybi Books" width="40" height="40">
+            <span>Hybi Books</span>
+          </div>
+          <p class="footer-description">
+            Nền tảng chia sẻ và đánh giá sách hàng đầu Việt Nam. 
+            Kết nối cộng đồng yêu sách, khám phá những cuốn sách hay.
+          </p>
+          <div class="footer-social">
+            <a href="#" class="social-link" title="Facebook">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              </svg>
+            </a>
+            <a href="#" class="social-link" title="Twitter">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+              </svg>
+            </a>
+            <a href="#" class="social-link" title="Instagram">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 6.62 5.367 11.987 11.988 11.987s11.987-5.367 11.987-11.987C24.004 5.367 18.637.001 12.017.001zM8.449 16.988c-1.297 0-2.448-.49-3.323-1.297C4.198 14.895 3.708 13.744 3.708 12.447s.49-2.448 1.297-3.323c.875-.807 2.026-1.297 3.323-1.297s2.448.49 3.323 1.297c.807.875 1.297 2.026 1.297 3.323s-.49 2.448-1.297 3.323c-.875.807-2.026 1.297-3.323 1.297zm7.83-9.781c-.49 0-.875-.385-.875-.875s.385-.875.875-.875.875.385.875.875-.385.875-.875.875z"/>
+              </svg>
+            </a>
+            <a href="#" class="social-link" title="YouTube">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+        
+        <div class="footer-section">
+          <h3 class="footer-title">Thông tin liên hệ</h3>
+          <div class="footer-contact">
+            <div class="contact-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              <span>131 Khu phố 1, P.Biên Hoà,Tỉnh Đồng Nai</span>
+            </div>
+            <div class="contact-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+              </svg>
+              <span>081 2072 512</span>
+            </div>
+            <div class="contact-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
+              </svg>
+              <span>contact@hybibooks.vn</span>
+            </div>
+            <div class="contact-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+              </svg>
+              <span>pebaoan.bh@gmail.com</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="footer-section">
+          <h3 class="footer-title">Liên kết hữu ích</h3>
+          <ul class="footer-links">
+            <li><a href="{{ url_for('books_list') }}">Tất cả sách</a></li>
+            <li><a href="{{ url_for('books_list', genre='Tiểu thuyết') }}">Tiểu thuyết</a></li>
+            <li><a href="{{ url_for('books_list', genre='Kinh tế') }}">Kinh tế</a></li>
+            <li><a href="{{ url_for('books_list', genre='Khoa học') }}">Khoa học</a></li>
+            <li><a href="{{ url_for('books_list', genre='Tâm lý') }}">Tâm lý</a></li>
+            <li><a href="{{ url_for('books_list', genre='Thiếu nhi') }}">Thiếu nhi</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-section">
+          <h3 class="footer-title">Hỗ trợ</h3>
+          <ul class="footer-links">
+            <li><a href="#">Hướng dẫn sử dụng</a></li>
+            <li><a href="#">Câu hỏi thường gặp</a></li>
+            <li><a href="#">Chính sách bảo mật</a></li>
+            <li><a href="#">Điều khoản sử dụng</a></li>
+            <li><a href="#">Báo cáo lỗi</a></li>
+            <li><a href="#">Liên hệ quản trị viên</a></li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <div class="footer-bottom-content">
+          <p>&copy; 2024 Hybi Books. Tất cả quyền được bảo lưu.</p>
+          <p>Được phát triển với ❤️ bởi đội ngũ Hybi Books</p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Chat widget: floating button + panel (bottom-right) -->
+    <div id="chat-widget" class="chat-widget" aria-hidden="false">
+      <button id="chat-toggle" class="chat-toggle" aria-label="Mở chat">💬</button>
+      <div id="chat-panel" class="chat-panel" hidden>
+        <div class="chat-header">Gợi ý sách <button id="chat-close" class="chat-close" aria-label="Đóng">×</button></div>
+        <div id="chat-messages" class="chat-messages" role="log" aria-live="polite"></div>
+        <form id="chat-widget-form" class="chat-widget-form">
+          <input id="chat-widget-input" name="q" placeholder="Hỏi về thể loại, tác giả hoặc tóm tắt..." autocomplete="off">
+          <button class="btn" type="submit">Gửi</button>
+        </form>
+      </div>
+    </div>
+    <script src="{{ url_for('static', filename='chat-widget.js') }}"></script>
+    <script src="{{ url_for('static', filename='animations.js') }}"></script>
+  </body>
+</html>

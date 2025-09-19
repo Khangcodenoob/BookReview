@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}Danh mục{% endblock %}
+{% block content %}
+<div class="admin-header">
+  <h2>Danh mục</h2>
+  <form method="post" action="{{ url_for('admin_categories_new') }}" class="form" style="grid-template-columns:1fr auto;align-items:end;max-width:420px">
+    <label>Tên danh mục
+      <input name="name" required placeholder="VD: Tiểu thuyết">
+    </label>
+    <button class="btn" type="submit">Thêm</button>
+  </form>
+  <p class="muted">Chỉ dành cho admin</p>
+  <p><a class="btn secondary" href="{{ url_for('admin_books') }}">← Quản trị sách</a></p>
+  
+</div>
+<table class="table">
+  <thead>
+    <tr><th>ID</th><th>Tên</th><th></th></tr>
+  </thead>
+  <tbody>
+    {% for c in categories %}
+    <tr>
+      <td>{{ c.id }}</td>
+      <td>{{ c.name }}</td>
+      <td style="text-align:right">
+        <form method="post" action="{{ url_for('admin_categories_delete', cat_id=c.id) }}" onsubmit="return confirm('Xoá danh mục này? Sách sẽ bị bỏ gắn danh mục.')">
+          <button class="btn secondary" type="submit">Xoá</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+{% endblock %}
+
+

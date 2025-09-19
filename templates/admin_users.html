@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+{% block title %}Quản lý tài khoản{% endblock %}
+{% block content %}
+<div class="admin-header">
+  <h2>Quản lý tài khoản</h2>
+  <p class="muted">Danh sách tất cả tài khoản đã đăng ký</p>
+</div>
+
+<!-- Thống kê tổng quan -->
+<div class="admin-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin: 24px 0;">
+  <div class="stat-card" style="background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px; text-align: center;">
+    <div style="font-size: 32px; font-weight: 800; color: var(--primary); margin-bottom: 8px;">{{ total_users }}</div>
+    <div style="color: var(--muted); font-size: 14px;">Tổng số tài khoản</div>
+  </div>
+  <div class="stat-card" style="background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px; text-align: center;">
+    <div style="font-size: 32px; font-weight: 800; color: var(--accent); margin-bottom: 8px;">{{ admin_count }}</div>
+    <div style="color: var(--muted); font-size: 14px;">Tài khoản Admin</div>
+  </div>
+  <div class="stat-card" style="background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px; text-align: center;">
+    <div style="font-size: 32px; font-weight: 800; color: #fbbf24; margin-bottom: 8px;">{{ user_count }}</div>
+    <div style="color: var(--muted); font-size: 14px;">Tài khoản User</div>
+  </div>
+  <div class="stat-card" style="background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px; text-align: center;">
+    <div style="font-size: 32px; font-weight: 800; color: #10b981; margin-bottom: 8px;">{{ users|length }}</div>
+    <div style="color: var(--muted); font-size: 14px;">Kết quả hiển thị</div>
+  </div>
+</div>
+
+<!-- Bộ lọc và tìm kiếm -->
+<div class="admin-filters" style="background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin: 24px 0;">
+  <form method="get" action="{{ url_for('admin_users') }}" style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <label style="font-weight: 500; color: var(--text);">Tìm kiếm:</label>
+      <input type="text" name="q" placeholder="Tên đăng nhập..." value="{{ q }}" style="padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text);">
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <label style="font-weight: 500; color: var(--text);">Vai trò:</label>
+      <select name="role" style="padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text);">
+        <option value="">Tất cả</option>
+        <option value="admin" {{ 'selected' if role_filter == 'admin' else '' }}>Admin</option>
+        <option value="user" {{ 'selected' if role_filter == 'user' else '' }}>User</option>
+      </select>
+    </div>
+    <button type="submit" class="btn" style="padding: 8px 16px;">Tìm kiếm</button>
+    <a href="{{ url_for('admin_users') }}" class="btn secondary" style="padding: 8px 16px; text-decoration: none;">Xóa bộ lọc</a>
+  </form>
+</div>
+
+<!-- Sắp xếp -->
+<div style="margin: 16px 0; display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+  <span class="muted">Sắp xếp:</span>
+  <a class="btn secondary" href="{{ url_for('admin_users', q=q, role=role_filter, sort='username_asc') }}">A → Z (Tên)</a>
+  <a class="btn secondary" href="{{ url_for('admin_users', q=q, role=role_filter, sort='username_desc') }}">Z → A (Tên)</a>
+  <a class="btn secondary" href="{{ url_for('admin_users', q=q, role=role_filter, sort='id_asc') }}">ID ↑</a>
+  <a class="btn secondary" href="{{ url_for('admin_users', q=q, role=role_filter, sort='id_desc') }}">ID ↓</a>
+  <a class="btn secondary" href="{{ url_for('admin_users', q=q, role=role_filter, sort='role_asc') }}">Vai trò ↑</a>
+  <a class="btn secondary" href="{{ url_for('admin_users', q=q, role=role_filter, sort='role_desc') }}">Vai trò ↓</a>
+  <a class="btn secondary" href="{{ url_for('admin_users', q=q, role=role_filter, sort='created_desc') }}">Mới nhất</a>
+</div>
+
+<!-- Bảng danh sách tài khoản -->
+<div class="table-container" style="background: var(--panel); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin: 24px 0;">
+  <table class="table" style="margin: 0;">
+    <thead style="background: var(--bg-secondary);">
+      <tr>
+        <th style="padding: 16px; border-bottom: 1px solid var(--border);">ID</th>
+        <th style="padding: 16px; border-bottom: 1px solid var(--border);">Tên đăng nhập</th>
+        <th style="padding: 16px; border-bottom: 1px solid var(--border);">Mật khẩu (Hash)</th>
+        <th style="padding: 16px; border-bottom: 1px solid var(--border);">Vai trò</th>
+        <th style="padding: 16px; border-bottom: 1px solid var(--border);">Ngày tạo</th>
+        <th style="padding: 16px; border-bottom: 1px solid var(--border); text-align: center;">Thao tác</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for user in users %}
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 16px; font-weight: 600; color: var(--primary);">{{ user.id }}</td>
+        <td style="padding: 16px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 14px;">
+              {{ user.username[0].upper() }}
+            </div>
+            <span style="font-weight: 500;">{{ user.username }}</span>
+          </div>
+        </td>
+        <td style="padding: 16px;">
+          <div style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: monospace; font-size: 12px; color: var(--muted); background: var(--bg-secondary); padding: 4px 8px; border-radius: 4px;" title="{{ user.password_hash }}">
+            {{ user.password_hash[:50] }}{{ '...' if user.password_hash|length > 50 else '' }}
+          </div>
+        </td>
+        <td style="padding: 16px;">
+          {% if user.role == 'admin' %}
+            <span style="background: #ef4444; color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 600;">ADMIN</span>
+          {% else %}
+            <span style="background: var(--accent); color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 600;">USER</span>
+          {% endif %}
+        </td>
+        <td style="padding: 16px; color: var(--muted); font-size: 14px;">
+          {{ user.created_at.split(' ')[0] if user.created_at else 'N/A' }}
+        </td>
+        <td style="padding: 16px; text-align: center;">
+          {% if user.role != 'admin' %}
+            <form method="post" action="{{ url_for('admin_users_delete', user_id=user.id) }}" onsubmit="return confirm('Bạn có chắc chắn muốn xóa tài khoản {{ user.username }}? Hành động này không thể hoàn tác.')" style="display: inline;">
+              <button class="btn secondary" type="submit" style="background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer;">
+                Xóa
+              </button>
+            </form>
+          {% else %}
+            <span style="color: var(--muted); font-size: 12px;">Không thể xóa</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Hướng dẫn quản lý tài khoản -->
+<div class="admin-guide" style="background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin: 32px 0;">
+  <h3 style="color: var(--text); margin: 0 0 16px 0; font-size: 20px;">👥 Hướng dẫn quản lý tài khoản</h3>
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+    <div>
+      <h4 style="color: var(--primary); margin: 0 0 8px 0;">🔍 Xem thông tin tài khoản</h4>
+      <p style="color: var(--muted); margin: 0; font-size: 14px; line-height: 1.5;">
+        Bảng trên hiển thị tất cả tài khoản đã đăng ký trong hệ thống, bao gồm ID, tên đăng nhập, vai trò và ngày tạo.
+      </p>
+    </div>
+    <div>
+      <h4 style="color: var(--accent); margin: 0 0 8px 0;">🛡️ Bảo mật tài khoản</h4>
+      <p style="color: var(--muted); margin: 0; font-size: 14px; line-height: 1.5;">
+        Tài khoản admin được bảo vệ và không thể xóa. Chỉ có thể xóa các tài khoản user thông thường.
+      </p>
+    </div>
+    <div>
+      <h4 style="color: #fbbf24; margin: 0 0 8px 0;">📊 Thống kê</h4>
+      <p style="color: var(--muted); margin: 0; font-size: 14px; line-height: 1.5;">
+        Theo dõi số lượng tài khoản admin, user và tổng số tài khoản để quản lý hệ thống hiệu quả.
+      </p>
+    </div>
+    <div>
+      <h4 style="color: #ef4444; margin: 0 0 8px 0;">⚠️ Lưu ý quan trọng</h4>
+      <p style="color: var(--muted); margin: 0; font-size: 14px; line-height: 1.5;">
+        Việc xóa tài khoản sẽ xóa tất cả dữ liệu liên quan (bookmarks, votes, reports). Hành động này không thể hoàn tác.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- Liên kết nhanh -->
+<div class="quick-links" style="background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin: 32px 0;">
+  <h3 style="color: var(--text); margin: 0 0 20px 0; font-size: 20px; font-weight: 700;">🔗 Liên kết nhanh</h3>
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+    <div style="background: white; border: 1px solid var(--border); border-radius: 12px; padding: 16px; text-align: center;">
+      <h4 style="color: var(--primary); margin: 0 0 8px 0; font-size: 16px; font-weight: 600;">📚 Quản trị sách</h4>
+      <p style="color: var(--muted); margin: 0 0 12px 0; font-size: 14px;">Quản lý và chỉnh sửa thông tin sách</p>
+      <a href="{{ url_for('admin_books') }}" class="btn" style="background: var(--primary); color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: 600;">Truy cập</a>
+    </div>
+    <div style="background: white; border: 1px solid var(--border); border-radius: 12px; padding: 16px; text-align: center;">
+      <h4 style="color: var(--accent); margin: 0 0 8px 0; font-size: 16px; font-weight: 600;">📝 Duyệt đánh giá</h4>
+      <p style="color: var(--muted); margin: 0 0 12px 0; font-size: 14px;">Kiểm tra và phê duyệt đánh giá từ người dùng</p>
+      <a href="{{ url_for('admin_reviews_queue') }}" class="btn" style="background: var(--accent); color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: 600;">Truy cập</a>
+    </div>
+    <div style="background: white; border: 1px solid var(--border); border-radius: 12px; padding: 16px; text-align: center;">
+      <h4 style="color: #10b981; margin: 0 0 8px 0; font-size: 16px; font-weight: 600;">🏠 Trang chủ</h4>
+      <p style="color: var(--muted); margin: 0 0 12px 0; font-size: 14px;">Quay về trang chủ của hệ thống</p>
+      <a href="{{ url_for('home') }}" class="btn" style="background: #10b981; color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: 600;">Truy cập</a>
+    </div>
+    <div style="background: white; border: 1px solid var(--border); border-radius: 12px; padding: 16px; text-align: center;">
+      <h4 style="color: #8b5cf6; margin: 0 0 8px 0; font-size: 16px; font-weight: 600;">👤 Hồ sơ cá nhân</h4>
+      <p style="color: var(--muted); margin: 0 0 12px 0; font-size: 14px;">Xem và chỉnh sửa thông tin cá nhân</p>
+      <a href="{{ url_for('profile') }}" class="btn" style="background: #8b5cf6; color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: 600;">Truy cập</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
