@@ -1,4 +1,4 @@
-# Hybi Books – Ứng dụng đánh giá sách (Flask)
+# Hybi Books – Website review đánh giá sách (Flask)
 
 Dự án này là ứng dụng web quản lý và đọc review sách bằng Flask + SQLite. Frontend dùng Jinja templates + CSS/JS thuần, tập trung triển khai nhanh, dễ bảo trì và mở rộng.
 
