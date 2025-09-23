@@ -2,21 +2,21 @@
 {% block title %}{% if is_edit %}Sửa sách{% else %}Thêm sách{% endif %}{% endblock %}
 {% block content %}
 <div class="page-header">
-  <h1 class="page-title">{% if is_edit %}📝 Sửa sách{% else %}➕ Thêm sách mới{% endif %}</h1>
+  <h1 class="page-title">{% if is_edit %}Sửa sách{% else %}Thêm sách mới{% endif %}</h1>
   <p class="page-subtitle">{% if is_edit %}Chỉnh sửa thông tin chi tiết của sách{% else %}Thêm sách mới vào thư viện{% endif %}</p>
 </div>
 
 <div class="form-container" style="background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 32px; margin: 24px 0; box-shadow: var(--shadow);">
-  <form method="post" class="form">
+  <form method="post" class="form" action="{% if is_edit %}{{ url_for('admin_books_edit', book_id=book.id) }}{% else %}{{ url_for('admin_books_new') }}{% endif %}" enctype="multipart/form-data" onsubmit="return validateForm()">
   <!-- Thông tin cơ bản -->
   <div class="form-section" style="margin-bottom: 32px;">
-    <h3 style="color: var(--text); margin: 0 0 20px 0; font-size: 18px; border-bottom: 2px solid var(--primary); padding-bottom: 8px;">📚 Thông tin cơ bản</h3>
+    <h3 style="color: var(--text); margin: 0 0 20px 0; font-size: 18px; border-bottom: 2px solid var(--primary); padding-bottom: 8px;">Thông tin cơ bản</h3>
     
     <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 20px; margin-bottom: 20px;">
       <label style="display: flex; flex-direction: column; gap: 8px;">
-        <span style="font-weight: 600; color: var(--text);">Mã sách <span style="color: #ef4444;">*</span></span>
-        <input name="book_code" required placeholder="VD: BK1001" value="{{ (book.book_code if book else '') }}" style="padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text);">
-        <small style="color: var(--muted); font-size: 12px;">Mã định danh duy nhất cho sách</small>
+        <span style="font-weight: 600; color: var(--text);">Mã sách {% if not is_edit %}<span style="color: #ef4444;">*</span>{% endif %}</span>
+        <input name="book_code" {% if not is_edit %}required{% endif %} placeholder="VD: BK1001" value="{{ (book.book_code if book else '') }}" style="padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text);">
+        <small style="color: var(--muted); font-size: 12px;">Mã định danh duy nhất cho sách (có thể để trống để tự sinh)</small>
       </label>
       <label style="display: flex; flex-direction: column; gap: 8px;">
         <span style="font-weight: 600; color: var(--text);">Tiêu đề sách <span style="color: #ef4444;">*</span></span>
@@ -41,13 +41,36 @@
 {% else %}
   <!-- Thông tin chi tiết -->
   <div class="form-section" style="margin-bottom: 32px;">
-    <h3 style="color: var(--text); margin: 0 0 20px 0; font-size: 18px; border-bottom: 2px solid var(--accent); padding-bottom: 8px;">🖼️ Hình ảnh & Phân loại</h3>
+    <h3 style="color: var(--text); margin: 0 0 20px 0; font-size: 18px; border-bottom: 2px solid var(--accent); padding-bottom: 8px;">Hình ảnh & Phân loại</h3>
     
-    <label style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px;">
-      <span style="font-weight: 600; color: var(--text);">Ảnh bìa sách</span>
-      <input name="cover_url" placeholder="https://example.com/book-cover.jpg" value="{{ (book.cover_url if book else '') }}" style="padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text);">
-      <small style="color: var(--muted); font-size: 12px;">URL hình ảnh bìa sách (khuyến nghị tỷ lệ 3:4)</small>
-    </label>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+      <label style="display: flex; flex-direction: column; gap: 8px;">
+        <span style="font-weight: 600; color: var(--text);">Upload hình ảnh</span>
+        <input type="file" name="cover_file" accept="image/*" style="padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text);">
+        <small style="color: var(--muted); font-size: 12px;">Chọn file hình ảnh từ máy tính</small>
+      </label>
+      <label style="display: flex; flex-direction: column; gap: 8px;">
+        <span style="font-weight: 600; color: var(--text);">Hoặc nhập URL</span>
+        <input name="cover_url" placeholder="https://example.com/book-cover.jpg" value="{{ (book.cover_url if book else '') }}" style="padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text);">
+        <small style="color: var(--muted); font-size: 12px;">URL hình ảnh bìa sách (sẽ tự động tải về và lưu)</small>
+        <label style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
+          <input type="checkbox" name="keep_external_url" value="1" style="margin: 0;">
+          <span style="font-size: 12px; color: var(--muted);">Giữ URL gốc (không tải về)</span>
+        </label>
+      </label>
+    </div>
+    {% if is_edit and book and book.cover_url %}
+    <div style="display:flex; gap:20px; align-items:flex-start; margin: 4px 0 16px 0; flex-wrap: wrap;">
+      <div style="display:flex; flex-direction:column; gap:6px;">
+        <span style="font-size: 12px; color: var(--muted);">Ảnh hiện tại</span>
+        <img src="{{ book.cover_url }}" alt="Bìa hiện tại" style="max-height: 160px; border:1px solid var(--border); border-radius:8px; background:#fff;">
+      </div>
+      <div id="newCoverPreview" style="display:none; flex-direction:column; gap:6px;">
+        <span style="font-size: 12px; color: var(--muted);">Xem trước ảnh mới</span>
+        <img id="coverPreviewImg" alt="Xem trước ảnh bìa" style="max-height: 160px; border:1px solid var(--border); border-radius:8px; background:#fff;">
+      </div>
+    </div>
+    {% endif %}
     
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
       <label style="display: flex; flex-direction: column; gap: 8px;">
@@ -84,7 +107,7 @@
   
   <!-- Thông tin xuất bản -->
   <div class="form-section" style="margin-bottom: 32px;">
-    <h3 style="color: var(--text); margin: 0 0 20px 0; font-size: 18px; border-bottom: 2px solid #fbbf24; padding-bottom: 8px;">📖 Thông tin xuất bản</h3>
+    <h3 style="color: var(--text); margin: 0 0 20px 0; font-size: 18px; border-bottom: 2px solid #fbbf24; padding-bottom: 8px;">Thông tin xuất bản</h3>
     
     <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 20px;">
       <label style="display: flex; flex-direction: column; gap: 8px;">
@@ -103,7 +126,7 @@
   
   <!-- Mô tả -->
   <div class="form-section" style="margin-bottom: 32px;">
-    <h3 style="color: var(--text); margin: 0 0 20px 0; font-size: 18px; border-bottom: 2px solid #8b5cf6; padding-bottom: 8px;">📝 Mô tả sách</h3>
+    <h3 style="color: var(--text); margin: 0 0 20px 0; font-size: 18px; border-bottom: 2px solid #8b5cf6; padding-bottom: 8px;">Mô tả sách</h3>
     
     <label style="display: flex; flex-direction: column; gap: 8px;">
       <span style="font-weight: 600; color: var(--text);">Tóm tắt nội dung</span>
@@ -113,12 +136,8 @@
 
     {% if is_edit and book %}
     <div style="display:flex; gap:8px; margin-top:10px; flex-wrap:wrap">
-      <form method="post" action="{{ url_for('admin_enhance_book_description', book_id=book.id) }}" onsubmit="return confirm('Tạo mô tả dài và hấp dẫn hơn cho sách này?')">
-        <button class="btn secondary" type="submit">Viết mô tả dài hơn</button>
-      </form>
-      <form method="post" action="{{ url_for('admin_generate_review_for_book', book_id=book.id) }}" onsubmit="return confirm('Tạo review biên tập cho sách này?')">
-        <button class="btn secondary" type="submit">Tạo review biên tập</button>
-      </form>
+      <button class="btn secondary" type="button" onclick="document.getElementById('enhanceDescForm').requestSubmit()">Viết mô tả dài hơn</button>
+      <button class="btn secondary" type="button" onclick="document.getElementById('genReviewForm').requestSubmit()">Tạo review biên tập</button>
     </div>
     {% endif %}
   </div>
@@ -143,12 +162,18 @@
   </form>
 </div>
 
+{% if is_edit and book %}
+<!-- Auxiliary forms moved outside the main form to avoid nested form issues -->
+<form id="enhanceDescForm" method="post" action="{{ url_for('admin_enhance_book_description', book_id=book.id) }}" style="display:none"></form>
+<form id="genReviewForm" method="post" action="{{ url_for('admin_generate_review_for_book', book_id=book.id) }}" style="display:none"></form>
+{% endif %}
+
 <!-- Hướng dẫn và liên kết -->
 <div class="form-help" style="background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin: 24px 0;">
-  <h3 style="color: var(--text); margin: 0 0 16px 0; font-size: 18px;">💡 Hướng dẫn sử dụng</h3>
+  <h3 style="color: var(--text); margin: 0 0 16px 0; font-size: 18px;">Hướng dẫn sử dụng</h3>
   <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
     <div>
-      <h4 style="color: var(--primary); margin: 0 0 8px 0; font-size: 14px;">📋 Thông tin bắt buộc</h4>
+      <h4 style="color: var(--primary); margin: 0 0 8px 0; font-size: 14px;">Thông tin bắt buộc</h4>
       <ul style="color: var(--muted); margin: 0; font-size: 13px; line-height: 1.5; padding-left: 16px;">
         <li>Mã sách: Định danh duy nhất</li>
         <li>Tiêu đề: Tên đầy đủ của sách</li>
@@ -156,7 +181,7 @@
       </ul>
     </div>
     <div>
-      <h4 style="color: var(--accent); margin: 0 0 8px 0; font-size: 14px;">🏷️ Phân loại</h4>
+      <h4 style="color: var(--accent); margin: 0 0 8px 0; font-size: 14px;">Phân loại</h4>
       <ul style="color: var(--muted); margin: 0; font-size: 13px; line-height: 1.5; padding-left: 16px;">
         <li>Danh mục: Phân loại chính</li>
         <li>Thể loại: Phân loại phụ</li>
@@ -164,14 +189,97 @@
       </ul>
     </div>
     <div>
-      <h4 style="color: #fbbf24; margin: 0 0 8px 0; font-size: 14px;">🔗 Quản lý</h4>
+      <h4 style="color: #fbbf24; margin: 0 0 8px 0; font-size: 14px;">Quản lý</h4>
       <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-        <a href="{{ url_for('admin_categories') }}" class="btn secondary" style="text-decoration: none; font-size: 12px; padding: 6px 12px;">📂 Danh mục</a>
-        <a href="{{ url_for('admin_tags') }}" class="btn secondary" style="text-decoration: none; font-size: 12px; padding: 6px 12px;">🏷️ Tags</a>
-        <a href="{{ url_for('admin_books') }}" class="btn secondary" style="text-decoration: none; font-size: 12px; padding: 6px 12px;">📚 Danh sách</a>
+        <a href="{{ url_for('admin_categories') }}" class="btn secondary" style="text-decoration: none; font-size: 12px; padding: 6px 12px;">Danh mục</a>
+        <a href="{{ url_for('admin_tags') }}" class="btn secondary" style="text-decoration: none; font-size: 12px; padding: 6px 12px;">Tags</a>
+        <a href="{{ url_for('admin_books') }}" class="btn secondary" style="text-decoration: none; font-size: 12px; padding: 6px 12px;">Danh sách</a>
       </div>
     </div>
   </div>
 </div>
+
+<script>
+function validateForm() {
+    // Get form elements
+    const title = document.querySelector('input[name="title"]');
+    const author = document.querySelector('input[name="author"]');
+    const bookCode = document.querySelector('input[name="book_code"]');
+    const coverFile = document.querySelector('input[name="cover_file"]');
+    const coverUrl = document.querySelector('input[name="cover_url"]');
+    
+    // Check required fields
+    if (!title.value.trim()) {
+        alert('Vui lòng nhập tiêu đề sách');
+        title.focus();
+        return false;
+    }
+    
+    if (!author.value.trim()) {
+        alert('Vui lòng nhập tác giả');
+        author.focus();
+        return false;
+    }
+    
+    // Book code is optional; if provided, enforce minimal length
+    const bookCodeValue = bookCode.value.trim();
+    if (bookCodeValue && bookCodeValue.length < 3) {
+        alert('Mã sách phải có ít nhất 3 ký tự nếu bạn nhập.');
+        bookCode.focus();
+        return false;
+    }
+    
+    // Check image upload
+    if (coverFile.files.length > 0) {
+        const file = coverFile.files[0];
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+        const maxSize = 5 * 1024 * 1024; // 5MB
+        
+        if (!allowedTypes.includes(file.type)) {
+            alert('Chỉ chấp nhận file hình ảnh (JPG, PNG, GIF, WebP)');
+            coverFile.focus();
+            return false;
+        }
+        
+        if (file.size > maxSize) {
+            alert('Kích thước file không được vượt quá 5MB');
+            coverFile.focus();
+            return false;
+        }
+    }
+    
+    return true;
+}
+// Preview new cover image when selecting file or typing URL
+document.addEventListener('DOMContentLoaded', function() {
+    const coverFile = document.querySelector('input[name="cover_file"]');
+    const coverUrl = document.querySelector('input[name="cover_url"]');
+    const previewWrap = document.getElementById('newCoverPreview');
+    const previewImg = document.getElementById('coverPreviewImg');
+    if (coverFile) {
+        coverFile.addEventListener('change', function() {
+            if (coverFile.files && coverFile.files.length > 0) {
+                const file = coverFile.files[0];
+                const url = URL.createObjectURL(file);
+                if (previewImg && previewWrap) {
+                    previewImg.src = url;
+                    previewWrap.style.display = 'flex';
+                }
+            }
+        });
+    }
+    if (coverUrl) {
+        coverUrl.addEventListener('input', function() {
+            const u = coverUrl.value.trim();
+            if (u && previewImg && previewWrap) {
+                previewImg.src = u;
+                previewWrap.style.display = 'flex';
+            } else if (previewWrap) {
+                previewWrap.style.display = 'none';
+            }
+        });
+    }
+});
+</script>
 {% endblock %}
 

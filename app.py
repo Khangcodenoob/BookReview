@@ -503,7 +503,7 @@ def create_app() -> Flask:
             (book_id, reviewer, rating_int, content, "pending"),
         )
         db.commit()
-        flash("Đã gửi đánh giá, chờ duyệt.")
+        flash("✅ Đã gửi đánh giá thành công, chờ duyệt!")
         return redirect(url_for("book_detail", book_id=book_id))
 
     # ---------------- Auth helpers (defined above) ----------------
@@ -789,11 +789,11 @@ def create_app() -> Flask:
         if existed:
             db.execute("DELETE FROM bookmarks WHERE user_id=? AND book_id=?", (uid, book_id))
             db.commit()
-            flash("Đã bỏ lưu sách.")
+            flash("✅ Đã bỏ lưu sách thành công!")
         else:
             db.execute("INSERT INTO bookmarks (user_id, book_id) VALUES (?,?)", (uid, book_id))
             db.commit()
-            flash("Đã lưu sách vào mục yêu thích.")
+            flash("✅ Đã lưu sách vào mục yêu thích thành công!")
         return redirect(url_for("book_detail", book_id=book_id))
 
     
@@ -820,7 +820,7 @@ def create_app() -> Flask:
             return redirect(url_for("admin_categories"))
         db.execute("INSERT INTO categories (name, slug) VALUES (?,?)", (name, None))
         db.commit()
-        flash("Đã thêm danh mục.")
+        flash("✅ Đã thêm danh mục thành công!")
         return redirect(url_for("admin_categories"))
 
     @app.route("/admin/categories/<int:cat_id>/delete", methods=["POST"])
@@ -831,7 +831,7 @@ def create_app() -> Flask:
         db.execute("UPDATE books SET category_id=NULL WHERE category_id=?", (cat_id,))
         db.execute("DELETE FROM categories WHERE id=?", (cat_id,))
         db.commit()
-        flash("Đã xoá danh mục.")
+        flash("✅ Đã xoá danh mục thành công!")
         return redirect(url_for("admin_categories"))
 
     # ---------------- Admin: Tags ----------------
@@ -856,7 +856,7 @@ def create_app() -> Flask:
             return redirect(url_for("admin_tags"))
         db.execute("INSERT INTO tags (name, slug) VALUES (?,?)", (name, None))
         db.commit()
-        flash("Đã thêm tag.")
+        flash("✅ Đã thêm tag thành công!")
         return redirect(url_for("admin_tags"))
 
     @app.route("/admin/tags/<int:tag_id>/delete", methods=["POST"])
@@ -866,7 +866,7 @@ def create_app() -> Flask:
         db.execute("DELETE FROM book_tags WHERE tag_id=?", (tag_id,))
         db.execute("DELETE FROM tags WHERE id=?", (tag_id,))
         db.commit()
-        flash("Đã xoá tag.")
+        flash("✅ Đã xoá tag thành công!")
         return redirect(url_for("admin_tags"))
 
     # ---------------- Admin: User Management ----------------
@@ -944,7 +944,7 @@ def create_app() -> Flask:
         db.execute("DELETE FROM review_reports WHERE reporter_user_id=?", (user_id,))
         db.execute("DELETE FROM users WHERE id=?", (user_id,))
         db.commit()
-        flash("Đã xóa tài khoản.")
+        flash("✅ Đã xóa tài khoản thành công!")
         return redirect(url_for("admin_users"))
 
     # ---------------- Admin: Review Moderation ----------------
@@ -997,7 +997,7 @@ f"""### Phân tích chi tiết\n\n1. Cấu trúc: Tác phẩm chia thành các c
             )
             inserted += 1
         db.commit()
-        flash(f"Đã tạo {inserted} review mẫu dài cho các sách chưa có review.")
+        flash(f"✅ Đã tạo {inserted} review mẫu dài cho các sách chưa có review thành công!")
         return redirect(url_for("admin_books"))
 
     @app.post("/admin/books/generate-summaries")
@@ -1085,8 +1085,8 @@ f"""## Kết luận\n\n{desc or f'Tác phẩm mang lại cảm hứng và hướ
                 db.execute("UPDATE reviews SET status=? WHERE id=?", (status, review_id))
             db.execute("INSERT INTO audit_log (action, meta) VALUES (?,?)", ("review_details_updated", f"id={review_id}"))
             db.commit()
-            flash("Đã cập nhật chi tiết review.")
-            return redirect(url_for("admin_reviews_queue"))
+        flash("✅ Đã cập nhật chi tiết review thành công!")
+        return redirect(url_for("admin_reviews_queue"))
         row = db.execute("SELECT r.id, r.book_id, b.title as book_title, r.reviewer, r.rating, r.content, r.details, r.status FROM reviews r JOIN books b ON b.id=r.book_id WHERE r.id=?", (review_id,)).fetchone()
         if not row:
             flash("Không tìm thấy review.")
@@ -1100,7 +1100,7 @@ f"""## Kết luận\n\n{desc or f'Tác phẩm mang lại cảm hứng và hướ
         db.execute("UPDATE reviews SET status='approved', moderated_at=CURRENT_TIMESTAMP, moderated_by=? WHERE id=?", (session.get("username"), review_id))
         db.execute("INSERT INTO audit_log (action, meta) VALUES (?,?)", ("review_approved", f"id={review_id}"))
         db.commit()
-        flash("Đã duyệt review.")
+        flash("✅ Đã duyệt review thành công!")
         return redirect(url_for("admin_reviews_queue"))
 
     @app.post("/admin/reviews/<int:review_id>/reject")
@@ -1111,7 +1111,7 @@ f"""## Kết luận\n\n{desc or f'Tác phẩm mang lại cảm hứng và hướ
         db.execute("UPDATE reviews SET status='rejected', moderated_at=CURRENT_TIMESTAMP, moderated_by=?, reject_reason=? WHERE id=?", (session.get("username"), reason or None, review_id))
         db.execute("INSERT INTO audit_log (action, meta) VALUES (?,?)", ("review_rejected", f"id={review_id};reason={reason}"))
         db.commit()
-        flash("Đã từ chối review.")
+        flash("✅ Đã từ chối review thành công!")
         return redirect(url_for("admin_reviews_queue"))
 
     # ---------------- Review interactions ----------------
@@ -1162,7 +1162,7 @@ f"""## Kết luận\n\n{desc or f'Tác phẩm mang lại cảm hứng và hướ
             (review_id, user_id, reason or None),
         )
         db.commit()
-        flash("Đã gửi báo cáo. Cảm ơn bạn!")
+        flash("✅ Đã gửi báo cáo thành công! Cảm ơn bạn!")
         return redirect(request.referrer or url_for("home"))
 
     # ---------------- Admin Books CRUD ----------------
@@ -1201,7 +1201,7 @@ f"""## Kết luận\n\n{desc or f'Tác phẩm mang lại cảm hứng và hướ
         cur = db.cursor()
         cur.executemany('INSERT INTO books (title, author, cover_url, description) VALUES (?,?,?,?)', demo)
         db.commit()
-        flash('Đã thêm sách demo.')
+        flash('✅ Đã thêm sách demo thành công!')
         return redirect(url_for('admin_books'))
     @app.route('/admin/books/fix-book-codes', methods=['POST'])
     @admin_required
@@ -1223,7 +1223,7 @@ f"""## Kết luận\n\n{desc or f'Tác phẩm mang lại cảm hứng và hướ
             db.execute("UPDATE books SET book_code=? WHERE id=?", (code, bid))
             updated += 1
         db.commit()
-        flash(f'Đã cập nhật mã cho {updated} sách.')
+        flash(f'✅ Đã cập nhật mã cho {updated} sách thành công!')
         return redirect(url_for('admin_books'))
 
     @app.route("/admin/books/new", methods=["GET", "POST"])
@@ -1234,11 +1234,47 @@ f"""## Kết luận\n\n{desc or f'Tác phẩm mang lại cảm hứng và hướ
             title = request.form.get("title", "").strip()
             author = request.form.get("author", "").strip()
             cover_url = request.form.get("cover_url", "").strip()
-            # if external URL provided, attempt to download and store locally
-            try:
-                cover_url = _download_cover_if_external(cover_url)
-            except Exception:
-                pass
+            
+            # Handle file upload
+            cover_file = request.files.get('cover_file')
+            if cover_file and cover_file.filename:
+                # Save uploaded file
+                filename = secure_filename(cover_file.filename)
+                if filename:
+                    # Ensure extension
+                    ext = filename.rsplit('.', 1)[-1].lower() if '.' in filename else 'jpg'
+                    if ext not in ALLOWED_IMAGE_EXT:
+                        ext = 'jpg'
+                    # Generate unique filename
+                    import time
+                    unique_filename = f"book_{int(time.time())}_{filename}"
+                    if '.' not in unique_filename:
+                        unique_filename += f".{ext}"
+                    dest_path = os.path.join(UPLOADS_DIR, unique_filename)
+                    cover_file.save(dest_path)
+                    cover_url = f"/static/uploads/{unique_filename}"
+                    flash(f"✅ Đã upload và lưu hình ảnh: {filename}")
+            elif cover_url and cover_url.strip():
+                # Check if user wants to keep external URL
+                keep_external = request.form.get('keep_external_url')
+                if keep_external:
+                    # Keep original URL without downloading
+                    cover_url = cover_url.strip()
+                    flash(f"✅ Đã lưu URL hình ảnh: {cover_url}")
+                else:
+                    # if external URL provided, attempt to download and store locally
+                    try:
+                        original_url = cover_url.strip()
+                        cover_url = _download_cover_if_external(original_url)
+                        if cover_url != original_url:
+                            flash(f"✅ Đã tải và lưu hình ảnh từ URL: {original_url}")
+                        else:
+                            flash(f"✅ Đã lưu URL hình ảnh: {original_url}")
+                    except Exception as e:
+                        print(f"Error downloading cover: {e}")
+                        flash(f"Không thể tải hình ảnh từ URL, đã lưu URL gốc: {cover_url}")
+                        # Keep original URL if download fails
+                        pass
             description = request.form.get("description", "").strip()
             genre = request.form.get("genre", "").strip()
             publisher = request.form.get("publisher", "").strip()
@@ -1288,7 +1324,7 @@ f"""## Kết luận\n\n{desc or f'Tác phẩm mang lại cảm hứng và hướ
             tags = _parse_tags_csv(tags_raw)
             _set_book_tags(db, book_id, tags)
             db.commit()
-            flash("Đã thêm sách.")
+            flash(f"✅ Đã thêm sách thành công: '{title}' của {author}")
             return redirect(url_for("admin_books"))
         # GET
         categories = db.execute("SELECT id, name FROM categories ORDER BY name").fetchall()
@@ -1302,10 +1338,46 @@ f"""## Kết luận\n\n{desc or f'Tác phẩm mang lại cảm hứng và hướ
             title = request.form.get("title", "").strip()
             author = request.form.get("author", "").strip()
             cover_url = request.form.get("cover_url", "").strip()
-            try:
-                cover_url = _download_cover_if_external(cover_url)
-            except Exception:
-                pass
+            
+            # Handle file upload
+            cover_file = request.files.get('cover_file')
+            if cover_file and cover_file.filename:
+                # Save uploaded file
+                filename = secure_filename(cover_file.filename)
+                if filename:
+                    # Ensure extension
+                    ext = filename.rsplit('.', 1)[-1].lower() if '.' in filename else 'jpg'
+                    if ext not in ALLOWED_IMAGE_EXT:
+                        ext = 'jpg'
+                    # Generate unique filename
+                    import time
+                    unique_filename = f"book_{book_id}_{int(time.time())}_{filename}"
+                    if '.' not in unique_filename:
+                        unique_filename += f".{ext}"
+                    dest_path = os.path.join(UPLOADS_DIR, unique_filename)
+                    cover_file.save(dest_path)
+                    cover_url = f"/static/uploads/{unique_filename}"
+                    flash(f"✅ Đã upload và lưu hình ảnh: {filename}")
+            elif cover_url and cover_url.strip():
+                # Check if user wants to keep external URL
+                keep_external = request.form.get('keep_external_url')
+                if keep_external:
+                    # Keep original URL without downloading
+                    cover_url = cover_url.strip()
+                    flash(f"✅ Đã lưu URL hình ảnh: {cover_url}")
+                else:
+                    try:
+                        original_url = cover_url.strip()
+                        cover_url = _download_cover_if_external(original_url)
+                        if cover_url != original_url:
+                            flash(f"✅ Đã tải và lưu hình ảnh từ URL: {original_url}")
+                        else:
+                            flash(f"✅ Đã lưu URL hình ảnh: {original_url}")
+                    except Exception as e:
+                        print(f"Error downloading cover: {e}")
+                        flash(f"Không thể tải hình ảnh từ URL, đã lưu URL gốc: {cover_url}")
+                        # Keep original URL if download fails
+                        pass
             description = request.form.get("description", "").strip()
             genre = request.form.get("genre", "").strip()
             publisher = request.form.get("publisher", "").strip()
@@ -1349,8 +1421,8 @@ f"""## Kết luận\n\n{desc or f'Tác phẩm mang lại cảm hứng và hướ
             tags = _parse_tags_csv(tags_raw)
             _set_book_tags(db, book_id, tags)
             db.commit()
-            flash("Đã cập nhật sách.")
-            return redirect(url_for("admin_books"))
+            flash(f"✅ Đã cập nhật sách thành công: '{title}' của {author}")
+            return redirect(url_for("admin_books_edit", book_id=book_id))
         # GET
         book = db.execute(
             "SELECT id, title, author, cover_url, description, genre, publisher, num_pages, book_code, category_id FROM books WHERE id=?",
@@ -1379,7 +1451,7 @@ f"""## Kết luận\n\n{desc or f'Tác phẩm mang lại cảm hứng và hướ
         db = get_db()
         db.execute("DELETE FROM books WHERE id=?", (book_id,))
         db.commit()
-        flash("Đã xoá sách.")
+        flash("✅ Đã xoá sách thành công!")
         return redirect(url_for("admin_books"))
 
     return app
