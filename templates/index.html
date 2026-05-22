@@ -2,10 +2,57 @@
 {% block title %}Trang chủ - Book Review{% endblock %}
 {% block content %}
 
-<div class="section-header" style="margin-top: 12px; margin-bottom: 12px; text-align: center;">
-  <h1 class="section-title" style="font-size: 40px; font-weight: 800; letter-spacing: .3px; margin: 0;">Chào mừng bạn đến với Hybi Books - Nơi đọc review sách miễn phí</h1>
-  <p class="section-subtitle" style="font-size: 16px; margin-top: 6px;">Khám phá những tựa sách được yêu thích và đề xuất</p>
+<!-- Modern Eye-catching Hero Section -->
+<div class="hero-banner" style="position: relative; padding: 60px 20px; text-align: center; margin-top: 20px; margin-bottom: 60px; border-radius: 24px; background: linear-gradient(135deg, rgba(37,99,235,0.03) 0%, rgba(14,165,233,0.08) 100%); border: 1px solid rgba(37,99,235,0.1); overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.02);">
+  
+  <!-- Decorative background elements -->
+  <div style="position: absolute; top: -100px; left: -100px; width: 300px; height: 300px; background: rgba(37, 99, 235, 0.15); border-radius: 50%; filter: blur(60px); z-index: 0; pointer-events: none;"></div>
+  <div style="position: absolute; bottom: -100px; right: -100px; width: 300px; height: 300px; background: rgba(14, 165, 233, 0.15); border-radius: 50%; filter: blur(60px); z-index: 0; pointer-events: none;"></div>
+  
+  <div style="position: relative; z-index: 1; max-width: 800px; margin: 0 auto;">
+    <div style="display: inline-block; padding: 6px 16px; background: rgba(37,99,235,0.1); color: var(--primary); font-weight: 600; font-size: 14px; border-radius: 99px; margin-bottom: 24px; border: 1px solid rgba(37,99,235,0.2);">
+      ✨ Nền tảng đọc sách thông minh
+    </div>
+    
+    <h1 style="font-size: clamp(36px, 5vw, 56px); font-weight: 800; color: var(--text); line-height: 1.2; margin-bottom: 20px; letter-spacing: -1px;">
+      Khám phá thế giới <span style="color: var(--primary); background: linear-gradient(90deg, #2563eb, #0ea5e9); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Tri thức</span>
+    </h1>
+    
+    <p style="font-size: clamp(16px, 2vw, 18px); color: var(--muted); margin-bottom: 40px; line-height: 1.6;">
+      Không gian sách hiện đại: khám phá sách hay, chia sẻ cảm nhận, và quản lý kệ sách cá nhân của bạn một cách dễ dàng.
+    </p>
+    
+    {% if not current_user.id %}
+    <div style="background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 32px; box-shadow: var(--shadow); margin-top: 20px;">
+      <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 24px; color: var(--text);">Trải nghiệm đầy đủ tính năng:</h3>
+      
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; text-align: left; margin-bottom: 32px;">
+        <div style="display: flex; align-items: center; gap: 12px; padding: 16px; background: rgba(37, 99, 235, 0.04); border-radius: 16px; border: 1px solid rgba(37,99,235,0.08); transition: transform 0.2s;">
+          <div style="width: 40px; height: 40px; background: var(--panel); border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); font-size: 20px; color: var(--text);">🤖</div>
+          <span style="font-weight: 600; font-size: 14px; color: var(--text);">Trợ lý AI thông minh</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px; padding: 16px; background: rgba(37, 99, 235, 0.04); border-radius: 16px; border: 1px solid rgba(37,99,235,0.08); transition: transform 0.2s;">
+          <div style="width: 40px; height: 40px; background: var(--panel); border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); font-size: 20px; color: var(--text);">📚</div>
+          <span style="font-weight: 600; font-size: 14px; color: var(--text);">Quản lý kệ sách</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px; padding: 16px; background: rgba(37, 99, 235, 0.04); border-radius: 16px; border: 1px solid rgba(37,99,235,0.08); transition: transform 0.2s;">
+          <div style="width: 40px; height: 40px; background: var(--panel); border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); font-size: 20px; color: var(--text);">🏆</div>
+          <span style="font-weight: 600; font-size: 14px; color: var(--text);">Thử thách đọc</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px; padding: 16px; background: rgba(37, 99, 235, 0.04); border-radius: 16px; border: 1px solid rgba(37,99,235,0.08); transition: transform 0.2s;">
+          <div style="width: 40px; height: 40px; background: var(--panel); border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); font-size: 20px; color: var(--text);">👥</div>
+          <span style="font-weight: 600; font-size: 14px; color: var(--text);">Kết nối cộng đồng</span>
+        </div>
+      </div>
+      
+      <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+        <a href="{{ url_for('register') }}" class="btn" style="background: var(--primary); color: white; padding: 14px 32px; font-weight: 600; border-radius: 99px; box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25); font-size: 16px; transition: all 0.3s ease; border: none;">Bắt đầu ngay</a>
+        <a href="{{ url_for('login') }}" class="btn" style="background: transparent; color: var(--text); border: 2px solid var(--border); padding: 14px 32px; font-weight: 600; border-radius: 99px; font-size: 16px; transition: all 0.3s ease;">Đăng nhập</a>
+      </div>
+    </div>
+    {% endif %}
   </div>
+</div>
 
 <!-- Dynamic Product Promotion Carousel 🎠 (restored) -->
 <div id="bookCarousel" class="carousel slide" data-bs-ride="carousel">
@@ -17,7 +64,7 @@
                   <div class="carousel-content">
                     <div class="carousel-figure">
                       <a href="{{ url_for('book_detail', book_id=book.id) }}">
-                        <img src="{{ (book.image and url_for('static', filename='uploads/' ~ book.image)) or (book.cover_url) or url_for('static', filename='placeholder.jpg') }}"
+                        <img src="{{ book.cover_url or url_for('static', filename='placeholder.jpg') }}"
                              alt="{{ book.title }}"
                              loading="eager"
                              onerror="this.onerror=null;this.src='{{ url_for('static', filename='placeholder.jpg') }}'">
@@ -28,7 +75,7 @@
                       <p class="book-meta">{{ book.author }}{% if book.genre %} • {{ book.genre }}{% endif %}</p>
                       <p class="book-desc">{{ (book.description or '')[:160] }}{% if (book.description or '')|length > 160 %}...{% endif %}</p>
                       <div class="book-actions">
-                        <a class="btn primary" href="{{ url_for('book_detail', book_id=book.id) }}">Đọc chi tiết</a>
+                        <a class="btn primary" href="{{ url_for('book_detail', book_id=book.id) }}">Xem chi tiết & Mua</a>
                         <a class="btn secondary" href="{{ url_for('books_list', genre=book.genre) }}">Xem cùng thể loại</a>
                       </div>
                     </div>
@@ -52,7 +99,6 @@
               </div>
           </div>
       {% endif %}
-
   </div>
 
   <button class="carousel-control-prev" type="button" data-bs-target="#bookCarousel" data-bs-slide="prev">
@@ -64,26 +110,82 @@
       <span class="visually-hidden">Sau</span>
   </button>
 </div>
-
-
 <!-- Hero Stats -->
-<section class="hero-stats">
-  <div class="stats-container">
-    <div class="stat-item">
-      <div class="stat-number">{{ latest_books|length }}+</div>
-      <div class="stat-label">Sách mới</div>
+<section class="hero-stats" style="margin: 40px 0; padding: 32px 0; background: var(--panel); border: 1px solid var(--border); border-radius: 12px; position: relative; overflow: hidden;">
+  <div class="stats-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 32px; max-width: 1200px; margin: 0 auto; padding: 0 20px; position: relative; z-index: 1;">
+    <div class="stat-item" style="text-align: center; padding: 20px;">
+      <div class="stat-number" style="font-size: 36px; font-weight: 700; margin-bottom: 8px; color: var(--text);">{{ latest_books|length }}+</div>
+      <div class="stat-label" style="font-size: 14px; color: var(--muted); font-weight: 500;">Sách mới</div>
     </div>
-    <div class="stat-item">
-      <div class="stat-number">{{ genres|length }}+</div>
-      <div class="stat-label">Thể loại</div>
+    <div class="stat-item" style="text-align: center; padding: 20px;">
+      <div class="stat-number" style="font-size: 36px; font-weight: 700; margin-bottom: 8px; color: var(--text);">{{ genres|length }}+</div>
+      <div class="stat-label" style="font-size: 14px; color: var(--muted); font-weight: 500;">Thể loại</div>
     </div>
-    <div class="stat-item">
-      <div class="stat-number">100+</div>
-      <div class="stat-label">Review</div>
+    <div class="stat-item" style="text-align: center; padding: 20px;">
+      <div class="stat-number" style="font-size: 36px; font-weight: 700; margin-bottom: 8px; color: var(--text);">{{ total_reviews }}+</div>
+      <div class="stat-label" style="font-size: 14px; color: var(--muted); font-weight: 500;">Đánh giá</div>
     </div>
-    <div class="stat-item">
-      <div class="stat-number">24/7</div>
-      <div class="stat-label">Hỗ trợ</div>
+    <div class="stat-item" style="text-align: center; padding: 20px;">
+      <div class="stat-number" style="font-size: 36px; font-weight: 700; margin-bottom: 8px; color: var(--text);">{{ total_users }}+</div>
+      <div class="stat-label" style="font-size: 14px; color: var(--muted); font-weight: 500;">Thành viên</div>
+    </div>
+  </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section" style="margin: 60px 0; padding: 40px 0;">
+  <div class="section-header" style="text-align: center; margin-bottom: 48px;">
+    <h2 class="section-title" style="font-size: 32px; font-weight: 700; color: var(--text); margin-bottom: 16px;">✨ Tính năng nổi bật</h2>
+    <p class="section-subtitle" style="color: var(--muted); font-size: 18px; max-width: 600px; margin: 0 auto;">Khám phá những tính năng độc đáo giúp bạn tìm kiếm và chia sẻ sách một cách thông minh</p>
+  </div>
+  
+  <div class="features-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 32px; max-width: 1200px; margin: 0 auto; padding: 0 20px;">
+    <!-- Feature 1: AI Chatbot -->
+    <div class="feature-card" style="background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 32px; text-align: center; transition: all 0.3s ease; position: relative; overflow: hidden;">
+      <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--primary), var(--accent));"></div>
+      <div class="feature-icon" style="font-size: 48px; margin-bottom: 20px;">🤖</div>
+      <h3 style="font-size: 24px; font-weight: 700; color: var(--text); margin-bottom: 16px;">Trợ lý sách AI</h3>
+      <p style="color: var(--muted); line-height: 1.6; margin-bottom: 24px;">Tìm kiếm sách thông minh dựa trên sở thích, tâm trạng và lịch sử đọc của bạn</p>
+      <div class="feature-badges" style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+        <span style="background: rgba(34, 197, 94, 0.1); color: var(--primary); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">AI Powered</span>
+        <span style="background: rgba(56, 189, 248, 0.1); color: var(--accent); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">24/7</span>
+      </div>
+    </div>
+    
+    <!-- Feature 2: Smart Reviews -->
+    <div class="feature-card" style="background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 32px; text-align: center; transition: all 0.3s ease; position: relative; overflow: hidden;">
+      <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--accent), var(--icon-primary));"></div>
+      <div class="feature-icon" style="font-size: 48px; margin-bottom: 20px;">⭐</div>
+      <h3 style="font-size: 24px; font-weight: 700; color: var(--text); margin-bottom: 16px;">Đánh giá thông minh</h3>
+      <p style="color: var(--muted); line-height: 1.6; margin-bottom: 24px;">Hệ thống đánh giá chi tiết với phân tích cảm xúc và gợi ý cá nhân hóa</p>
+      <div class="feature-badges" style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+        <span style="background: rgba(245, 158, 11, 0.1); color: var(--icon-primary); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">Smart</span>
+        <span style="background: rgba(34, 197, 94, 0.1); color: var(--primary); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">Community</span>
+      </div>
+    </div>
+    
+    <!-- Feature 3: Personal Library -->
+    <div class="feature-card" style="background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 32px; text-align: center; transition: all 0.3s ease; position: relative; overflow: hidden;">
+      <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--icon-primary), var(--primary));"></div>
+      <div class="feature-icon" style="font-size: 48px; margin-bottom: 20px;">📚</div>
+      <h3 style="font-size: 24px; font-weight: 700; color: var(--text); margin-bottom: 16px;">Kệ sách cá nhân</h3>
+      <p style="color: var(--muted); line-height: 1.6; margin-bottom: 24px;">Quản lý sách đã đọc, đang đọc và muốn đọc với thống kê chi tiết</p>
+      <div class="feature-badges" style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+        <span style="background: rgba(34, 197, 94, 0.1); color: var(--primary); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">Personal</span>
+        <span style="background: rgba(56, 189, 248, 0.1); color: var(--accent); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">Analytics</span>
+      </div>
+    </div>
+    
+    <!-- Feature 4: Social Features -->
+    <div class="feature-card" style="background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 32px; text-align: center; transition: all 0.3s ease; position: relative; overflow: hidden;">
+      <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--primary), var(--accent));"></div>
+      <div class="feature-icon" style="font-size: 48px; margin-bottom: 20px;">👥</div>
+      <h3 style="font-size: 24px; font-weight: 700; color: var(--text); margin-bottom: 16px;">Cộng đồng sách</h3>
+      <p style="color: var(--muted); line-height: 1.6; margin-bottom: 24px;">Kết nối với bạn bè, chia sẻ review và tham gia thử thách đọc sách</p>
+      <div class="feature-badges" style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+        <span style="background: rgba(56, 189, 248, 0.1); color: var(--accent); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">Social</span>
+        <span style="background: rgba(245, 158, 11, 0.1); color: var(--icon-primary); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">Challenges</span>
+      </div>
     </div>
   </div>
 </section>
@@ -193,7 +295,7 @@
   <div class="grid">
     {% for b in trending %}
     <a class="card trending-card" href="{{ url_for('book_detail', book_id=b.id) }}" style="animation-delay: {{ loop.index0 * 0.1 }}s; position: relative;">
-      <div class="trending-badge" style="position: absolute; top: 8px; right: 8px; background: linear-gradient(45deg, #ff6b6b, #ee5a24); color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; z-index: 2; box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);">
+      <div class="trending-badge" style="position: absolute; top: 8px; right: 8px; background: var(--panel); color: var(--text); border: 1px solid var(--border); padding: 2px 6px; border-radius: 6px; font-size: 11px; font-weight: 500; z-index: 2;">
         ⚡ #{{ loop.index }}
       </div>
       <div class="cover">
@@ -213,6 +315,53 @@
   </div>
 </section>
 {% endif %}
+
+<!-- Featured Reviews Section -->
+<section class="featured-reviews-section" style="margin: 40px 0; padding: 32px 0; background: linear-gradient(135deg, var(--panel), rgba(255,255,255,0.02)); border-radius: 20px; border: 1px solid var(--border);">
+  <div class="section-header" style="text-align: center; margin-bottom: 32px;">
+    <h2 class="section-title" style="font-size: 28px; font-weight: 700; color: var(--text); margin-bottom: 12px;">💬 Đánh giá nổi bật</h2>
+    <p class="section-subtitle" style="color: var(--muted); font-size: 16px;">Những chia sẻ chân thực từ cộng đồng yêu sách</p>
+  </div>
+  
+  <div class="reviews-showcase" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 24px; max-width: 1200px; margin: 0 auto; padding: 0 20px;">
+    {% for review in featured_reviews %}
+    <div class="review-showcase-card" style="background: var(--bg); border: 1px solid var(--border); border-radius: 16px; padding: 24px; position: relative; transition: all 0.3s ease;">
+      <div class="review-header" style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+        <div style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--accent)); display: flex; align-items: center; justify-content: center; color: #06210e; font-size: 18px; font-weight: 600;">
+          {{ review.reviewer[0].upper() }}
+        </div>
+        <div>
+          <div style="font-weight: 600; color: var(--text); margin-bottom: 4px;">{{ review.reviewer }}</div>
+          <div style="display: flex; gap: 2px; margin-bottom: 4px;">
+            {% for i in range(5) %}
+              <span style="color: var(--icon-primary); font-size: 16px;">{% if i < review.rating %}★{% else %}☆{% endif %}</span>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      <div class="review-content" style="color: var(--text); line-height: 1.6; margin-bottom: 16px;">
+        "{{ (review.content or '')[:200] }}{% if (review.content or '')|length > 200 %}...{% endif %}"
+      </div>
+      <div class="review-meta" style="display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 1px solid var(--border);">
+        <span style="color: var(--muted); font-size: 14px;">📚 Sách: "{{ review.book_title }}"</span>
+        <span style="color: var(--muted); font-size: 12px;">
+          {% if review.days_ago == 0 %}Hôm nay
+          {% elif review.days_ago == 1 %}1 ngày trước
+          {% elif review.days_ago < 7 %}{{ review.days_ago }} ngày trước
+          {% elif review.days_ago < 30 %}{{ (review.days_ago / 7)|round|int }} tuần trước
+          {% else %}{{ (review.days_ago / 30)|round|int }} tháng trước{% endif %}
+        </span>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  
+  <div style="text-align: center; margin-top: 32px;">
+    <a href="{{ url_for('books_list') }}" class="btn primary" style="padding: 12px 24px; font-size: 16px; font-weight: 600; text-decoration: none; border-radius: 12px;">
+      📖 Xem tất cả đánh giá
+    </a>
+  </div>
+</section>
 
 {% if not top_week and latest_books %}
 <section class="featured-section">
@@ -277,7 +426,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Check if carousel exists
   if (totalSlides === 0) {
-    console.log('No carousel slides found');
     return;
   }
 
@@ -796,10 +944,67 @@ style.textContent = `
   }
 `;
 document.head.appendChild(style);
+
+// Add hover effects for feature cards and stat cards
+document.addEventListener('DOMContentLoaded', function() {
+  const featureCards = document.querySelectorAll('.feature-card');
+  const statCards = document.querySelectorAll('.stat-item');
+  
+  // Feature cards hover effects
+  featureCards.forEach(card => {
+    card.addEventListener('mouseenter', function() {
+      this.style.transform = 'translateY(-8px)';
+      this.style.boxShadow = '0 20px 40px rgba(0,0,0,0.15)';
+    });
+    
+    card.addEventListener('mouseleave', function() {
+      this.style.transform = 'translateY(0)';
+      this.style.boxShadow = 'none';
+    });
+  });
+  
+  // Stat cards hover effects
+  statCards.forEach(card => {
+    card.addEventListener('mouseenter', function() {
+      this.style.transform = 'translateY(-4px) scale(1.02)';
+      this.style.boxShadow = '0 12px 40px rgba(0,0,0,0.2)';
+    });
+    
+    card.addEventListener('mouseleave', function() {
+      this.style.transform = 'translateY(0) scale(1)';
+      this.style.boxShadow = '0 8px 32px rgba(0,0,0,0.1)';
+    });
+  });
+  
+  // Add intersection observer for animations
+  const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+  };
+  
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, observerOptions);
+  
+  // Observe feature cards for animation
+  featureCards.forEach((card, index) => {
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(30px)';
+    card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    card.style.transitionDelay = `${index * 0.1}s`;
+    observer.observe(card);
+  });
+});
 </script>
 
 {% endblock %}
 
+{% block scripts %}
 <script>
 // Simple Carousel logic for #bookCarousel (no external dependency)
 document.addEventListener('DOMContentLoaded', function() {
@@ -817,20 +1022,30 @@ document.addEventListener('DOMContentLoaded', function() {
   };
 
   const next = () => show((index + 1) % items.length);
-  const prev = () => show((index - 1 + items.length) % items.length);
+  const prev = () => show(index === 0 ? items.length - 1 : index - 1);
+
+  let interval = null;
+  const start = () => {
+    if (interval) return;
+    interval = setInterval(next, 5000);
+  };
+  const stop = () => {
+    if (interval) {
+      clearInterval(interval);
+      interval = null;
+    }
+  };
+
+  const reset = () => { stop(); start(); };
 
   const btnPrev = root.querySelector('.carousel-control-prev');
   const btnNext = root.querySelector('.carousel-control-next');
-  if (btnPrev) btnPrev.addEventListener('click', (e) => { e.preventDefault(); prev(); reset(); });
-  if (btnNext) btnNext.addEventListener('click', (e) => { e.preventDefault(); next(); reset(); });
-
-  let timer = null;
-  const start = () => { timer = setInterval(next, 5000); };
-  const stop = () => { if (timer) { clearInterval(timer); timer = null; } };
-  const reset = () => { stop(); start(); };
+  if(btnPrev) btnPrev.addEventListener('click', () => { prev(); reset(); });
+  if(btnNext) btnNext.addEventListener('click', () => { next(); reset(); });
 
   root.addEventListener('mouseenter', stop);
   root.addEventListener('mouseleave', start);
   start();
 });
 </script>
+{% endblock %}

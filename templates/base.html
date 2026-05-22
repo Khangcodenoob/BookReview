@@ -5,77 +5,350 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}Book Review{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='enhanced-styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='layout-enhancements.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='header-elegant.css') }}">
     <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}" type="image/svg+xml">
     <script>
       (function(){
-        try{var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme', t);}catch(e){}
+        try{
+          var t = localStorage.getItem('theme') || 'light';
+          // Force reset to light mode once for the new design update
+          if (t === 'dark' && !localStorage.getItem('theme_updated_to_light')) {
+            t = 'light';
+            localStorage.setItem('theme', 'light');
+            localStorage.setItem('theme_updated_to_light', 'true');
+          }
+          document.documentElement.setAttribute('data-theme', t);
+        }catch(e){}
       })();
+      
+      // Theme toggle function
+      function toggleTheme() {
+        const html = document.documentElement;
+        const current = html.getAttribute('data-theme') || 'light';
+        const next = current === 'dark' ? 'light' : 'dark';
+        html.setAttribute('data-theme', next);
+        try {
+          localStorage.setItem('theme', next);
+        } catch(e) {}
+      }
+      
+      // Mobile menu toggle
+      function toggleMobileMenu() {
+        const mobileNav = document.getElementById('mobileNav');
+        const toggle = document.querySelector('.mobile-menu-toggle');
+        
+        if (mobileNav.classList.contains('active')) {
+          mobileNav.classList.remove('active');
+          toggle.classList.remove('active');
+        } else {
+          mobileNav.classList.add('active');
+          toggle.classList.add('active');
+        }
+      }
+      
+      // Close mobile menu when clicking outside
+      document.addEventListener('click', function(e) {
+        const mobileNav = document.getElementById('mobileNav');
+        const toggle = document.querySelector('.mobile-menu-toggle');
+        
+        if (!mobileNav.contains(e.target) && !toggle.contains(e.target)) {
+          mobileNav.classList.remove('active');
+          toggle.classList.remove('active');
+        }
+      });
+      
+      // Header scroll effects
+      window.addEventListener('scroll', function() {
+        const header = document.querySelector('.site-header');
+        if (window.scrollY > 50) {
+          header.classList.add('scrolled');
+        } else {
+          header.classList.remove('scrolled');
+        }
+      });
+      
+      // Admin dropdown function - SIMPLE AND DIRECT
+      function toggleAdminDropdown(e) {
+        if (e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        
+        const adminDropdown = document.getElementById('admin-dropdown');
+        const adminMenu = document.getElementById('admin-menu');
+        
+        if (!adminDropdown || !adminMenu) {
+          console.error('Admin dropdown elements not found!');
+          return false;
+        }
+        
+        // Close user dropdown
+        const userDropdown = document.querySelector('.user-dropdown');
+        if (userDropdown) {
+          userDropdown.classList.remove('active');
+        }
+        // Close categories dropdown
+        const catDropdown = document.getElementById('categories-dropdown');
+        if (catDropdown) catDropdown.classList.remove('active');
+        const catMenu = document.getElementById('categories-menu');
+        if (catMenu) catMenu.style.display = 'none';
+        
+        // Toggle admin dropdown
+        const isActive = adminDropdown.classList.contains('active');
+        
+        if (isActive) {
+          // Hide menu
+          adminDropdown.classList.remove('active');
+          adminMenu.style.display = 'none';
+          adminMenu.style.opacity = '0';
+          adminMenu.style.visibility = 'hidden';
+          adminMenu.style.pointerEvents = 'none';
+        } else {
+          // Show menu - FORCE with inline styles
+          adminDropdown.classList.add('active');
+          adminMenu.style.display = 'block';
+          adminMenu.style.opacity = '1';
+          adminMenu.style.visibility = 'visible';
+          adminMenu.style.pointerEvents = 'auto';
+          adminMenu.style.position = 'absolute';
+          adminMenu.style.top = '100%';
+          adminMenu.style.left = '0';
+          adminMenu.style.zIndex = '10000';
+        }
+        
+        return false;
+      }
+      
+      // Make function globally available
+      window.toggleAdminDropdown = toggleAdminDropdown;
+      
+
+      
+      // User dropdown function
+      function toggleUserDropdown(e) {
+        if (e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        
+        const userDropdown = document.querySelector('.user-dropdown');
+        if (!userDropdown) return false;
+        
+        // Close admin dropdown
+        const adminDropdown = document.getElementById('admin-dropdown');
+        if (adminDropdown) {
+          adminDropdown.classList.remove('active');
+        }
+        
+        // Toggle user dropdown
+        userDropdown.classList.toggle('active');
+        return false;
+      }
+      
+
+      // Simple click outside handler - use setTimeout to avoid conflicts
+      document.addEventListener('click', function(e) {
+        setTimeout(function() {
+          const adminDropdown = document.getElementById('admin-dropdown');
+          const adminMenu = document.getElementById('admin-menu');
+          const userDropdown = document.querySelector('.user-dropdown');
+          
+          if (!adminDropdown || !adminMenu) return;
+          
+          // Check if click is inside admin dropdown
+          const clickedAdmin = adminDropdown.contains(e.target) || 
+                              e.target.id === 'admin-toggle' ||
+                              e.target.closest('#admin-menu') ||
+                              e.target.closest('.dropdown-toggle');
+          
+          // Check if click is inside user dropdown
+          const clickedUser = userDropdown && userDropdown.contains(e.target);
+          
+          const clickedCat = (catDropdown && (catDropdown.contains(e.target) || e.target.id === 'categories-toggle' || e.target.closest('#categories-menu')));
+          
+          // Only close if click is outside
+          if (!clickedAdmin) {
+            adminDropdown.classList.remove('active');
+            adminMenu.style.cssText = 'display: none !important; opacity: 0 !important; visibility: hidden !important; pointer-events: none !important;';
+          }
+          
+          if (userDropdown && !userDropdown.contains(e.target)) {
+            userDropdown.classList.remove('active');
+          }
+        }, 10);
+      });
+      
+      // Initialize on DOM ready
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+          // Admin dropdown initialized
+        });
+      } else {
+        // Admin dropdown initialized
+      }
     </script>
 </head>
-<body>
+<body data-authenticated="{{ '1' if current_user.id else '0' }}">
     <header class="site-header">
-        <div class="container">
-            <a class="brand" href="{{ url_for('home') }}" style="display:flex;align-items:center;gap:8px">
-              <img src="{{ url_for('static', filename='logo.svg') }}" alt="Hybi Books" width="28" height="28" style="display:block">
-              <div>
-                <div style="font-size: 18px; font-weight: 700; color: var(--text);">Hybi Books</div>
-                <div style="font-size: 12px; color: var(--muted); font-weight: 500;">Khám phá thế giới sách</div>
-              </div>
+        <div class="header-container">
+            <!-- Logo & Brand Section -->
+            <div class="brand-section">
+                <a class="brand" href="{{ url_for('home') }}" style="color: var(--text);">
+                    <div class="brand-logo">
+                        <img src="{{ url_for('static', filename='logo.svg') }}" alt="Chạm Sách" width="32" height="32" style="border-radius: 8px;">
+                    </div>
+                    <div class="brand-text">
+                        <div class="brand-title" style="color: var(--text);">Chạm Sách</div>
+                    </div>
             </a>
-            <nav>
-                <form method="get" action="{{ url_for('books_list') }}">
-                  <div class="search-container">
-                    <input class="search-input" name="q" placeholder="Tìm kiếm sách yêu thích..." value="{{ request.args.get('q','') }}" onfocus="this.placeholder='Tìm sách, tác giả, thể loại...'" onblur="if(this.value==='') this.placeholder='Tìm kiếm sách yêu thích...'">
-                  </div>
-                  <button class="btn search-btn" type="submit">🔍 Tìm</button>
+            </div>
+
+            <div class="search-section">
+                <form method="get" action="{{ url_for('books_list') }}" class="search-form">
+                    <div class="search-input-wrapper">
+                        <input class="search-input" name="q" placeholder="Tìm kiếm sách, tác giả..." value="{{ request.args.get('q','') }}">
+                        <button class="search-btn" type="submit">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"/>
+                                <path d="M21 21l-4.35-4.35"/>
+                            </svg>
+                        </button>
+                    </div>
                 </form>
-                <a href="{{ url_for('home') }}">Trang chủ</a>
-                <a href="{{ url_for('books_list') }}">Sách</a>
+            </div>
+
+            <!-- Navigation Section -->
+            <nav class="main-nav">
+                <div class="nav-links">
+                    <a href="{{ url_for('home') }}" class="nav-link">Trang chủ</a>
+                    <a href="{{ url_for('books_list') }}" class="nav-link">Sách</a>
+
+                    {% if current_user.id %}
+                        <a href="{{ url_for('my_shelves') }}" class="nav-link">Kệ sách</a>
+                        <a href="{{ url_for('activity_feed') }}" class="nav-link">Feed</a>
+                        <a href="{{ url_for('challenges_list') }}" class="nav-link">Thử thách</a>
+                    {% endif %}
                 {% if current_user.role == 'admin' %}
-                <a href="{{ url_for('admin_books') }}">Quản trị</a>
-                <a href="{{ url_for('admin_users') }}">Tài khoản</a>
-                <a href="{{ url_for('admin_reviews_queue') }}">Duyệt review</a>
+                        <div class="nav-dropdown" id="admin-dropdown">
+                            <a href="{{ url_for('admin_dashboard') }}" class="nav-link dropdown-toggle" id="admin-toggle" style="cursor: pointer; pointer-events: auto !important; user-select: none; position: relative; z-index: 1;">Quản trị</a>
+                            <div class="dropdown-menu" id="admin-menu" style="position: absolute !important; top: 100% !important; left: 0 !important; z-index: 10000 !important; display: none !important; opacity: 0 !important; visibility: hidden !important; pointer-events: none !important; background: var(--panel); border: 1px solid var(--border); border-radius: 8px; box-shadow: var(--shadow); padding: 8px 0; margin-top: 4px; min-width: 200px;">
+                                <a href="{{ url_for('admin_books') }}" class="dropdown-item" style="cursor: pointer; display: block; pointer-events: auto; padding: 8px 16px; color: var(--text); text-decoration: none; transition: all 0.2s ease;">Quản lý sách</a>
+                                <a href="{{ url_for('admin_orders') }}" class="dropdown-item" style="cursor: pointer; display: block; pointer-events: auto; padding: 8px 16px; color: var(--text); text-decoration: none; transition: all 0.2s ease;">Đơn hàng</a>
+                                <a href="{{ url_for('admin_categories') }}" class="dropdown-item" style="cursor: pointer; display: block; pointer-events: auto; padding: 8px 16px; color: var(--text); text-decoration: none; transition: all 0.2s ease;">Danh mục</a>
+                                <a href="{{ url_for('admin_tags') }}" class="dropdown-item" style="cursor: pointer; display: block; pointer-events: auto; padding: 8px 16px; color: var(--text); text-decoration: none; transition: all 0.2s ease;">Tags</a>
+                                <a href="{{ url_for('admin_users') }}" class="dropdown-item" style="cursor: pointer; display: block; pointer-events: auto; padding: 8px 16px; color: var(--text); text-decoration: none; transition: all 0.2s ease;">Tài khoản</a>
+                                <a href="{{ url_for('admin_reviews_queue') }}" class="dropdown-item" style="cursor: pointer; display: block; pointer-events: auto; padding: 8px 16px; color: var(--text); text-decoration: none; transition: all 0.2s ease;">Duyệt review</a>
+                            </div>
+                        </div>
                 {% endif %}
-                {% if current_user.id %}
-                  <a href="{{ url_for('profile') }}">Hồ sơ</a>
-                  <span class="user-info">
-                    <img src="{{ current_user.avatar_url or url_for('static', filename='placeholder.jpg') }}" alt="{{ current_user.username }}" class="user-avatar">
-                    <span class="muted">Xin chào, {{ current_user.username }}</span>
-                  </span>
-                  <a href="{{ url_for('logout') }}">Đăng xuất</a>
-                {% else %}
-                  <a href="{{ url_for('login') }}">Đăng nhập</a>
-                  <a href="{{ url_for('register') }}">Đăng ký</a>
-                {% endif %}
-                <button class="theme-toggle" onclick="(function(){
-                  var html=document.documentElement;var cur=html.getAttribute('data-theme')||'dark';
-                  var next=cur==='dark'?'light':'dark';html.setAttribute('data-theme',next);try{localStorage.setItem('theme',next)}catch(e){}
-                })()"></button>
+                </div>
             </nav>
+
+            <!-- User Section -->
+            <div class="user-section">
+                {% if current_user.id %}
+                    <div class="user-dropdown">
+                        <button class="user-trigger" onclick="toggleUserDropdown(event); return false;">
+                    <img src="{{ current_user.avatar_url or url_for('static', filename='placeholder.jpg') }}" alt="{{ current_user.username }}" class="user-avatar">
+                            <span class="user-name">{{ current_user.username }}</span>
+                            <svg class="dropdown-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6,9 12,15 18,9"/>
+                            </svg>
+                        </button>
+                        <div class="user-menu">
+                            <a href="{{ url_for('profile') }}" class="user-menu-item">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                    <circle cx="12" cy="7" r="4"/>
+                                </svg>
+                                Hồ sơ
+                            </a>
+                            <div class="user-menu-divider"></div>
+                            <a href="{{ url_for('logout') }}" class="user-menu-item logout">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                                    <polyline points="16,17 21,12 16,7"/>
+                                    <line x1="21" y1="12" x2="9" y2="12"/>
+                                </svg>
+                                Đăng xuất
+                            </a>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="auth-links">
+                        <a href="{{ url_for('login') }}" class="auth-link login">Đăng nhập</a>
+                        <a href="{{ url_for('register') }}" class="auth-link register">Đăng ký</a>
+                    </div>
+                {% endif %}
+                
+                <!-- Theme Toggle -->
+                <button class="theme-toggle" onclick="toggleTheme()" title="Chuyển đổi giao diện">
+                    <svg class="theme-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="5"/>
+                        <line x1="12" y1="1" x2="12" y2="3"/>
+                        <line x1="12" y1="21" x2="12" y2="23"/>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                        <line x1="1" y1="12" x2="3" y2="12"/>
+                        <line x1="21" y1="12" x2="23" y2="12"/>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Mobile Menu Toggle -->
+            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+        </div>
+
+        <!-- Mobile Navigation -->
+        <div class="mobile-nav" id="mobileNav">
+            <div class="mobile-nav-content">
+                <div class="mobile-search">
+                    <form method="get" action="{{ url_for('books_list') }}">
+                        <input class="mobile-search-input" name="q" placeholder="Tìm kiếm sách..." value="{{ request.args.get('q','') }}">
+                        <button class="mobile-search-btn" type="submit">🔍</button>
+                    </form>
+                </div>
+                <div class="mobile-nav-links">
+                    <a href="{{ url_for('home') }}" class="mobile-nav-link">Trang chủ</a>
+                    <a href="{{ url_for('books_list') }}" class="mobile-nav-link">Sách</a>
+                    {% if current_user.id %}
+                        <a href="{{ url_for('my_shelves') }}" class="mobile-nav-link">Kệ sách</a>
+                        <a href="{{ url_for('activity_feed') }}" class="mobile-nav-link">Feed</a>
+                        <a href="{{ url_for('challenges_list') }}" class="mobile-nav-link">Thử thách</a>
+                        <a href="{{ url_for('profile') }}" class="mobile-nav-link">Hồ sơ</a>
+                        {% if current_user.role == 'admin' %}
+                            <a href="{{ url_for('admin_books') }}" class="mobile-nav-link">Quản lý sách</a>
+                            <a href="{{ url_for('admin_orders') }}" class="mobile-nav-link">Đơn hàng</a>
+                            <a href="{{ url_for('admin_categories') }}" class="mobile-nav-link">Danh mục</a>
+                            <a href="{{ url_for('admin_tags') }}" class="mobile-nav-link">Tags</a>
+                            <a href="{{ url_for('admin_users') }}" class="mobile-nav-link">Tài khoản</a>
+                            <a href="{{ url_for('admin_reviews_queue') }}" class="mobile-nav-link">Duyệt review</a>
+                        {% endif %}
+                        <a href="{{ url_for('logout') }}" class="mobile-nav-link logout">Đăng xuất</a>
+                    {% else %}
+                        <a href="{{ url_for('login') }}" class="mobile-nav-link">Đăng nhập</a>
+                        <a href="{{ url_for('register') }}" class="mobile-nav-link">Đăng ký</a>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </header>
     <div class="content-wrapper">
       {% set active_genre = selected_genre if selected_genre is defined else request.args.get('genre','') %}
-      <div class="container" style="margin-top:6px">
-        <nav class="navbar" aria-label="Danh mục sách">
-          <a class="{{ 'active' if not active_genre else '' }}" href="{{ url_for('books_list') }}">Tất cả</a>
-          <a class="{{ 'active' if active_genre=='Tiểu thuyết' else '' }}" href="{{ url_for('books_list', genre='Tiểu thuyết') }}">Tiểu thuyết</a>
-          <a class="{{ 'active' if active_genre=='Truyện ngắn' else '' }}" href="{{ url_for('books_list', genre='Truyện ngắn') }}">Truyện ngắn</a>
-          <a class="{{ 'active' if active_genre=='Kinh tế' else '' }}" href="{{ url_for('books_list', genre='Kinh tế') }}">Kinh tế</a>
-          <a class="{{ 'active' if active_genre=='Văn học' else '' }}" href="{{ url_for('books_list', genre='Văn học') }}">Văn học</a>
-          <a class="{{ 'active' if active_genre=='Khoa học' else '' }}" href="{{ url_for('books_list', genre='Khoa học') }}">Khoa học</a>
-          <a class="{{ 'active' if active_genre=='Tâm lý' else '' }}" href="{{ url_for('books_list', genre='Tâm lý') }}">Tâm lý</a>
-          <a class="{{ 'active' if active_genre=='Thiếu nhi' else '' }}" href="{{ url_for('books_list', genre='Thiếu nhi') }}">Thiếu nhi</a>
-          <a class="{{ 'active' if active_genre=='Lịch sử' else '' }}" href="{{ url_for('books_list', genre='Lịch sử') }}">Lịch sử</a>
-          <a class="{{ 'active' if active_genre=='Khác' else '' }}" href="{{ url_for('books_list', genre='Khác') }}">Khác</a>
-        </nav>
-      </div>
       <main class="container">
-          {% with messages = get_flashed_messages() %}
+          {% with messages = get_flashed_messages(with_categories=true) %}
               {% if messages %}
                   <ul class="flash">
-                  {% for msg in messages %}
-                      <li>{{ msg }}</li>
+                  {% for category, msg in messages %}
+                      <li class="flash-{{ category|default('message') }}">{{ msg }}</li>
                   {% endfor %}
                   </ul>
               {% endif %}
@@ -89,30 +362,30 @@
       <div class="footer-content">
         <div class="footer-section">
           <div class="footer-logo">
-            <img src="{{ url_for('static', filename='logo.svg') }}" alt="Hybi Books" width="40" height="40">
-            <span>Hybi Books</span>
+            <img src="{{ url_for('static', filename='logo.svg') }}" alt="Chạm Sách" width="40" height="40">
+            <span>Chạm Sách</span>
           </div>
           <p class="footer-description">
             Nền tảng chia sẻ và đánh giá sách hàng đầu Việt Nam. 
             Kết nối cộng đồng yêu sách, khám phá những cuốn sách hay.
           </p>
           <div class="footer-social">
-            <a href="#" class="social-link" title="Facebook">
+            <a href="#" class="social-link" title="Facebook" style="--brand-color: #1877F2; --brand-color-soft: rgba(24, 119, 242, 0.15);">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
               </svg>
             </a>
-            <a href="#" class="social-link" title="Twitter">
+            <a href="#" class="social-link" title="Twitter" style="--brand-color: #1DA1F2; --brand-color-soft: rgba(29, 161, 242, 0.15);">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
               </svg>
             </a>
-            <a href="#" class="social-link" title="Instagram">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 6.62 5.367 11.987 11.988 11.987s11.987-5.367 11.987-11.987C24.004 5.367 18.637.001 12.017.001zM8.449 16.988c-1.297 0-2.448-.49-3.323-1.297C4.198 14.895 3.708 13.744 3.708 12.447s.49-2.448 1.297-3.323c.875-.807 2.026-1.297 3.323-1.297s2.448.49 3.323 1.297c.807.875 1.297 2.026 1.297 3.323s-.49 2.448-1.297 3.323c-.875.807-2.026 1.297-3.323 1.297zm7.83-9.781c-.49 0-.875-.385-.875-.875s.385-.875.875-.875.875.385.875.875-.385.875-.875.875z"/>
+            <a href="#" class="social-link" title="Zalo" style="--brand-color: #0068FF; --brand-color-soft: rgba(0, 104, 255, 0.15);">
+              <svg width="20" height="20" viewBox="0 0 50 50" fill="currentColor">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M7.779 43.5892C10.1019 43.846 13.0061 43.1836 15.0682 42.1825C24.0225 47.1318 38.0197 46.8954 46.4923 41.4732C46.8209 40.9803 47.1279 40.4677 47.4128 39.9363C49.1062 36.7779 50.0004 33.22 50.0004 27.1316V22.7175C50.0004 16.629 49.1062 13.0711 47.4128 9.91273C45.7385 6.75436 43.2461 4.28093 40.0877 2.58758C36.9293 0.894239 33.3714 0 27.283 0H22.8499C17.6644 0 14.2982 0.652754 11.4699 1.89893C11.3153 2.03737 11.1636 2.17818 11.0151 2.32135C2.71734 10.3203 2.08658 27.6593 9.12279 37.0782C9.13064 37.0921 9.13933 37.1061 9.14889 37.1203C10.2334 38.7185 9.18694 41.5154 7.55068 43.1516C7.28431 43.399 7.37944 43.5512 7.779 43.5892Z"/>
               </svg>
             </a>
-            <a href="#" class="social-link" title="YouTube">
+            <a href="#" class="social-link" title="YouTube" style="--brand-color: #FF0000; --brand-color-soft: rgba(255, 0, 0, 0.15);">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
               </svg>
@@ -141,7 +414,7 @@
                 <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
                 <polyline points="22,6 12,13 2,6"/>
               </svg>
-              <span>contact@hybibooks.vn</span>
+              <span>contact@chamsach.vn</span>
             </div>
             <div class="contact-item">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -167,29 +440,43 @@
         <div class="footer-section">
           <h3 class="footer-title">Hỗ trợ</h3>
           <ul class="footer-links">
-            <li><a href="#">Hướng dẫn sử dụng</a></li>
-            <li><a href="#">Câu hỏi thường gặp</a></li>
-            <li><a href="#">Chính sách bảo mật</a></li>
-            <li><a href="#">Điều khoản sử dụng</a></li>
-            <li><a href="#">Báo cáo lỗi</a></li>
-            <li><a href="#">Liên hệ quản trị viên</a></li>
+            <li><a href="{{ url_for('help_page') }}">Hướng dẫn sử dụng</a></li>
+            <li><a href="{{ url_for('faq') }}">Câu hỏi thường gặp</a></li>
+            <li><a href="{{ url_for('privacy') }}">Chính sách bảo mật</a></li>
+            <li><a href="{{ url_for('terms') }}">Điều khoản sử dụng</a></li>
+            <li><a href="{{ url_for('report_bug') }}">Báo cáo lỗi</a></li>
+            <li><a href="{{ url_for('contact_admin') }}">Liên hệ quản trị viên</a></li>
           </ul>
         </div>
       </div>
       
       <div class="footer-bottom">
         <div class="footer-bottom-content">
-          <p>&copy; 2024 Hybi Books. Tất cả quyền được bảo lưu.</p>
-          <p>Được phát triển với ❤️ bởi đội ngũ Hybi Books</p>
+          <p>&copy; 2024 Chạm Sách. Tất cả quyền được bảo lưu.</p>
+          <p>Được phát triển với ❤️ bởi đội ngũ Chạm Sách</p>
         </div>
       </div>
     </footer>
 
-    <!-- Chat widget: floating button + panel (bottom-right) -->
+    <!-- Enhanced Chat widget: floating button + expandable panel (bottom-right) -->
     <div id="chat-widget" class="chat-widget" aria-hidden="false">
       <button id="chat-toggle" class="chat-toggle" aria-label="Mở chat">💬</button>
       <div id="chat-panel" class="chat-panel" hidden>
-        <div class="chat-header">Gợi ý sách <button id="chat-close" class="chat-close" aria-label="Đóng">×</button></div>
+        <div class="chat-header">
+          <div>
+            <h3>🤖 Trợ lý sách AI</h3>
+            <p style="margin:0;font-size:12px;opacity:0.9;">Sẵn sàng giúp bạn tìm sách hay!</p>
+          </div>
+          <div class="chat-controls">
+            <button id="chat-minimize" class="chat-control-btn" aria-label="Thu nhỏ" title="Thu nhỏ">➖</button>
+            <button id="chat-expand" class="chat-control-btn" aria-label="Mở rộng" title="Mở rộng">⛶</button>
+            <button id="chat-fullscreen" class="chat-control-btn" aria-label="Toàn màn hình" title="Toàn màn hình">⛶</button>
+            <button id="chat-settings" class="chat-control-btn" aria-label="Cài đặt" title="Cài đặt">⚙️</button>
+            <button id="chat-export" class="chat-control-btn" aria-label="Xuất chat" title="Xuất lịch sử">📤</button>
+            <button id="chat-search" class="chat-control-btn" aria-label="Tìm kiếm" title="Tìm trong chat">🔍</button>
+            <button id="chat-close" class="chat-control-btn" aria-label="Đóng" title="Đóng chat">✕</button>
+          </div>
+        </div>
         <div id="chat-messages" class="chat-messages" role="log" aria-live="polite"></div>
         <form id="chat-widget-form" class="chat-widget-form">
           <input id="chat-widget-input" name="q" placeholder="Hỏi về thể loại, tác giả hoặc tóm tắt..." autocomplete="off">
@@ -197,7 +484,15 @@
         </form>
       </div>
     </div>
+    <script src="{{ url_for('static', filename='ai-engine.js') }}"></script>
     <script src="{{ url_for('static', filename='chat-widget.js') }}"></script>
     <script src="{{ url_for('static', filename='animations.js') }}"></script>
+    <script src="{{ url_for('static', filename='enhanced-books.js') }}"></script>
+    
+    <!-- Donate Widget -->
+    {% include 'partials/donate_widget.html' %}
+    <script src="{{ url_for('static', filename='donate.js') }}"></script>
+
+    {% block scripts %}{% endblock %}
   </body>
 </html>

@@ -8,6 +8,7 @@
       <p>Tham gia cộng đồng review sách ngay hôm nay</p>
     </div>
     <form method="post" class="form auth-form" novalidate>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
       <div class="form-group">
         <label for="reg-email">Email</label>
         <input id="reg-email" name="email" type="email" autocomplete="email" required>
@@ -42,8 +43,8 @@
         <input type="checkbox" id="agree" required> Tôi đồng ý với Điều khoản & Chính sách
       </label>
 
-      {% if config.RECAPTCHA_SITEKEY %}
-      <div class="g-recaptcha" data-sitekey="{{ config.RECAPTCHA_SITEKEY }}"></div>
+      {% if config.RECAPTCHA_SITE_KEY %}
+      <div class="g-recaptcha" data-sitekey="{{ config.RECAPTCHA_SITE_KEY }}"></div>
       <script src="https://www.google.com/recaptcha/api.js" async defer></script>
       {% endif %}
 

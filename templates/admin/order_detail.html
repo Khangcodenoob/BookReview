@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% block title %}Đơn hàng #{{ order.id }} - Admin{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">Đơn hàng #{{ order.id }}</h1>
+  <p class="page-subtitle">User: {{ order.user.username if order.user else order.user_id }} | {{ order.created_at.strftime('%d/%m/%Y %H:%M') if order.created_at else '' }}</p>
+</div>
+
+<div class="admin-order-detail" style="max-width: 900px; margin: 0 auto;">
+  <div style="background: var(--panel); border-radius: 16px; border: 1px solid var(--border); padding: 24px; margin-bottom: 24px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+      <div>
+        <span style="padding: 6px 14px; border-radius: 8px; font-size: 14px; font-weight: 600;
+          {% if order.status == 'pending' %}background: #fef3c7; color: #92400e;
+          {% elif order.status == 'paid' %}background: #dbeafe; color: #1e40af;
+          {% elif order.status == 'shipped' %}background: #d1fae5; color: #065f46;
+          {% elif order.status == 'canceled' %}background: #fee2e2; color: #991b1b;
+          {% else %}background: var(--border); color: var(--text);{% endif %}">
+          {{ order.status }}
+        </span>
+      </div>
+      <div style="font-size: 24px; font-weight: 700; color: var(--primary);">{{ "{:,.0f}".format(order.total) }} VND</div>
+    </div>
+
+    <form method="post" action="{{ url_for('admin_order_status', order_id=order.id) }}" style="margin-bottom: 24px;">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label style="margin-right: 8px; color: var(--muted);">Đổi trạng thái:</label>
+      <select name="status" style="padding: 8px 12px; border-radius: 8px; margin-right: 8px; background: var(--bg); color: var(--text); border: 1px solid var(--border);">
+        <option value="pending" {% if order.status == 'pending' %}selected{% endif %}>pending</option>
+        <option value="paid" {% if order.status == 'paid' %}selected{% endif %}>paid</option>
+        <option value="shipped" {% if order.status == 'shipped' %}selected{% endif %}>shipped</option>
+        <option value="canceled" {% if order.status == 'canceled' %}selected{% endif %}>canceled</option>
+      </select>
+      <button type="submit" class="btn secondary" style="padding: 8px 16px;">Cập nhật</button>
+    </form>
+
+    <form method="post" action="{{ url_for('admin_order_payment', order_id=order.id) }}" style="margin-bottom: 24px;">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="mark_paid" value="1">
+      <button type="submit" class="btn primary" style="padding: 8px 16px;">Đánh dấu đã thanh toán</button>
+    </form>
+
+    <table style="width: 100%; border-collapse: collapse;">
+      <thead>
+        <tr style="border-bottom: 2px solid var(--border);">
+          <th style="text-align: left; padding: 12px 0; color: var(--muted); font-weight: 600;">Sản phẩm</th>
+          <th style="text-align: right; padding: 12px 0; color: var(--muted); font-weight: 600;">Đơn giá</th>
+          <th style="text-align: center; padding: 12px 0; color: var(--muted); font-weight: 600;">SL</th>
+          <th style="text-align: right; padding: 12px 0; color: var(--muted); font-weight: 600;">Thành tiền</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in order.items %}
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding: 16px 0;">{{ item.title_snapshot }}</td>
+          <td style="text-align: right; padding: 16px 0;">{{ "{:,.0f}".format(item.unit_price) }} VND</td>
+          <td style="text-align: center; padding: 16px 0;">{{ item.quantity }}</td>
+          <td style="text-align: right; padding: 16px 0; font-weight: 600;">{{ "{:,.0f}".format(item.line_total) }} VND</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid var(--border);">
+      <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+        <span style="color: var(--muted);">Tạm tính:</span>
+        <span>{{ "{:,.0f}".format(order.subtotal) }} VND</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+        <span style="color: var(--muted);">Phí vận chuyển:</span>
+        <span>{{ "{:,.0f}".format(order.shipping_fee) }} VND</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; font-size: 18px; font-weight: 700;">
+        <span>Tổng cộng:</span>
+        <span style="color: var(--primary);">{{ "{:,.0f}".format(order.total) }} VND</span>
+      </div>
+    </div>
+  </div>
+
+  <a href="{{ url_for('admin_orders') }}" class="btn secondary">Quay lại danh sách</a>
+</div>
+{% endblock %}

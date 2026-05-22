@@ -1,0 +1,270 @@
+/* Enhanced Layout for Wider Screens - Layout Enhancements */
+
+/* Global container improvements */
+.container {
+  max-width: 1500px !important;
+  margin: 0 auto !important;
+  padding: 0 20px !important;
+  width: 100% !important;
+}
+
+/* Responsive breakpoints for optimal viewing */
+@media (min-width: 1200px) {
+  .container { max-width: 1400px !important; }
+}
+
+@media (min-width: 1440px) {
+  .container { max-width: 1600px !important; }
+}
+
+@media (min-width: 1600px) {
+  .container { max-width: 1800px !important; }
+}
+
+@media (min-width: 1920px) {
+  .container { max-width: 2000px !important; }
+}
+
+/* Header and footer consistency */
+.site-header .container,
+.footer .footer-content {
+  max-width: 1500px !important;
+  margin: 0 auto !important;
+  padding: 0 20px !important;
+}
+
+@media (min-width: 1200px) {
+  .site-header .container,
+  .footer .footer-content { max-width: 1400px !important; }
+}
+
+@media (min-width: 1440px) {
+  .site-header .container,
+  .footer .footer-content { max-width: 1600px !important; }
+}
+
+@media (min-width: 1600px) {
+  .site-header .container,
+  .footer .footer-content { max-width: 1800px !important; }
+}
+
+@media (min-width: 1920px) {
+  .site-header .container,
+  .footer .footer-content { max-width: 2000px !important; }
+}
+
+/* Enhanced grid layouts for wider screens */
+.grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
+  gap: 24px !important;
+  width: 100% !important;
+  max-width: none !important;
+}
+
+@media (min-width: 1200px) {
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important;
+    gap: 28px !important;
+  }
+}
+
+@media (min-width: 1440px) {
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)) !important;
+    gap: 32px !important;
+  }
+}
+
+/* Categories grid improvements */
+.categories-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
+  gap: 20px !important;
+  width: 100% !important;
+  max-width: none !important;
+}
+
+@media (min-width: 1200px) {
+  .categories-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
+    gap: 24px !important;
+  }
+}
+
+@media (min-width: 1440px) {
+  .categories-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)) !important;
+    gap: 28px !important;
+  }
+}
+
+/* Features grid for homepage */
+.features-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important;
+  gap: 32px !important;
+  width: 100% !important;
+  max-width: none !important;
+}
+
+@media (min-width: 1200px) {
+  .features-grid {
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)) !important;
+    gap: 36px !important;
+  }
+}
+
+@media (min-width: 1440px) {
+  .features-grid {
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)) !important;
+    gap: 40px !important;
+  }
+}
+
+/* Reviews showcase grid */
+.reviews-showcase {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)) !important;
+  gap: 24px !important;
+  width: 100% !important;
+  max-width: none !important;
+}
+
+@media (min-width: 1200px) {
+  .reviews-showcase {
+    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)) !important;
+    gap: 28px !important;
+  }
+}
+
+@media (min-width: 1440px) {
+  .reviews-showcase {
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)) !important;
+    gap: 32px !important;
+  }
+}
+
+/* Stats container improvements */
+.stats-container {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+  gap: 32px !important;
+  width: 100% !important;
+  max-width: none !important;
+}
+
+@media (min-width: 1200px) {
+  .stats-container {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important;
+    gap: 36px !important;
+  }
+}
+
+@media (min-width: 1440px) {
+  .stats-container {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)) !important;
+    gap: 40px !important;
+  }
+}
+
+/* Similar books grid */
+.similar-books-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
+  gap: 20px !important;
+  width: 100% !important;
+  max-width: none !important;
+}
+
+@media (min-width: 1200px) {
+  .similar-books-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
+    gap: 24px !important;
+  }
+}
+
+@media (min-width: 1440px) {
+  .similar-books-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)) !important;
+    gap: 28px !important;
+  }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .container,
+  .site-header .container,
+  .footer .footer-content {
+    max-width: 100% !important;
+    padding: 0 16px !important;
+  }
+  
+  .grid,
+  .categories-grid,
+  .features-grid,
+  .reviews-showcase,
+  .stats-container,
+  .similar-books-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .container,
+  .site-header .container,
+  .footer .footer-content {
+    padding: 0 12px !important;
+  }
+  
+  .grid,
+  .categories-grid,
+  .features-grid,
+  .reviews-showcase,
+  .stats-container,
+  .similar-books-grid {
+    gap: 12px !important;
+  }
+}
+
+/* Ensure all cards and components use full available width */
+.card,
+.panel,
+.feature-card,
+.review-showcase-card,
+.stat-item,
+.similar-book-card {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+/* Exception: donate modal must NOT be forced full-width */
+.donate-modal {
+  width: 92% !important;
+  max-width: 460px !important;
+}
+
+/* Admin and management pages */
+.admin-table,
+.admin-grid {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+/* Filters and forms */
+.filters-section,
+.filters-form {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+/* Pagination improvements */
+.pagination {
+  width: 100% !important;
+  max-width: none !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 16px !important;
+}

@@ -1,6 +1,11 @@
 import sqlite3
+import os
 
-# Cập nhật hình ảnh bìa sách thực tế
+# Get the project root directory
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DB_PATH = os.path.join(BASE_DIR, 'books.db')
+
+# Update real book covers
 real_covers = {
     "Những người khốn khổ": "https://covers.openlibrary.org/b/isbn/9780140444308-L.jpg",
     "Chiến tranh và Hòa bình": "https://covers.openlibrary.org/b/isbn/9780140447934-L.jpg", 
@@ -40,7 +45,7 @@ real_covers = {
 }
 
 try:
-    conn = sqlite3.connect('books.db')
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     
     updated = 0

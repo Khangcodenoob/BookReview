@@ -1,0 +1,357 @@
+/* Classic bookstore theme (light/dark) */
+
+/* Typography + spacing
+   Lưu ý: dùng font hỗ trợ tiếng Việt tốt để tránh hiện tượng
+   ký tự có dấu bị tách/cách (khoảng cách bất thường giữa chữ). */
+html,
+body {
+  font-family: "Times New Roman", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont,
+    "Helvetica Neue", Arial, sans-serif;
+  letter-spacing: 0;
+}
+
+/* Theme variables mapped to existing system:
+   Base variables are defined in `static/styles.css`:
+   --bg, --panel, --text, --muted, --primary, --primary-700, --accent, --border, --shadow, --header-bg
+*/
+
+/* Classic Light */
+[data-theme="light"] {
+  --bg: #f3ead6;           /* parchment */
+  --panel: #fff7e6;        /* paper */
+  --text: #2a1b10;         /* ink */
+  --muted: #5c4634;        /* faded ink */
+  --primary: #7a4b22;      /* leather brown */
+  --primary-700: #5f3716;  /* deep leather */
+  --accent: #b08a2e;       /* brass */
+  --border: #d3bfa2;       /* aged edge */
+  --shadow: 0 14px 35px rgba(43, 26, 16, 0.14);
+  --header-bg: #2b1a10;    /* dark wood */
+  --header-text: #f6edd9;  /* warm paper on wood */
+  --header-muted: rgba(246, 237, 217, 0.82);
+}
+
+/* Classic Dark */
+[data-theme="dark"] {
+  --bg: #15100c;           /* dark wood */
+  --panel: #1c140f;        /* leather */
+  --text: #f2e7d3;         /* warm paper */
+  --muted: #c9b89b;        /* faded paper */
+  --primary: #c89c3a;      /* brass highlight */
+  --primary-700: #a7791a;
+  --accent: #8c5a2b;       /* warm brown */
+  --border: #3a2a1f;
+  --shadow: 0 16px 45px rgba(0, 0, 0, 0.45);
+  --header-bg: #0f0b08;
+  --header-text: #f2e7d3;
+  --header-muted: rgba(242, 231, 211, 0.78);
+}
+
+/* Background texture (pure CSS, no images) */
+body {
+  background:
+    radial-gradient(1000px 600px at 10% 0%, rgba(176, 138, 46, 0.08), transparent 60%),
+    radial-gradient(900px 700px at 90% 10%, rgba(122, 75, 34, 0.10), transparent 55%),
+    linear-gradient(180deg, color-mix(in oklab, var(--bg) 92%, #000) 0%, var(--bg) 35%, var(--bg) 100%);
+  color: var(--text);
+}
+
+/* Header / nav */
+.site-header {
+  background: linear-gradient(180deg, color-mix(in oklab, var(--header-bg) 92%, #000), var(--header-bg)) !important;
+  border-bottom: 1px solid color-mix(in oklab, var(--border) 55%, var(--header-bg)) !important;
+  box-shadow: 0 6px 28px rgba(0,0,0,0.18) !important;
+}
+
+.site-header a,
+.site-header button {
+  font-family: Georgia, "Times New Roman", Times, serif;
+  color: var(--header-text) !important;
+}
+
+.brand-title {
+  letter-spacing: 0.2px !important;
+}
+
+.brand-tagline {
+  opacity: 0.92;
+  color: var(--header-muted) !important;
+}
+
+/* Header-elegant overrides (ensure readable in classic theme) */
+.site-header .brand-title,
+.site-header .nav-link,
+.site-header .dropdown-toggle,
+.site-header .user-name,
+.site-header .auth-link {
+  color: var(--header-text) !important;
+}
+
+.site-header .nav-link:hover,
+.site-header .dropdown-toggle:hover,
+.site-header .auth-link:hover {
+  background: rgba(255,255,255,0.08) !important;
+}
+
+.site-header .search-input-wrapper {
+  background: color-mix(in oklab, var(--panel) 92%, var(--bg)) !important;
+  border-color: color-mix(in oklab, var(--border) 70%, var(--accent)) !important;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.18) !important;
+}
+
+.site-header .search-input-wrapper:focus-within {
+  background: var(--panel) !important;
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 25%, transparent) !important;
+}
+
+.site-header .search-input {
+  color: var(--text) !important;
+}
+
+.site-header .search-input::placeholder {
+  color: color-mix(in oklab, var(--muted) 85%, var(--text)) !important;
+}
+
+.site-header .search-btn {
+  color: var(--primary) !important;
+}
+
+/* Dropdown menu surfaces (some are inline background white) */
+.dropdown-menu,
+.site-header .dropdown-menu,
+.nav-dropdown .dropdown-menu,
+.user-menu {
+  background: var(--panel) !important;
+  color: var(--text) !important;
+  border: 1px solid var(--border) !important;
+}
+
+.dropdown-item,
+.user-menu-item {
+  color: var(--text) !important;
+}
+
+.dropdown-item:hover,
+.user-menu-item:hover {
+  background: color-mix(in oklab, var(--panel) 80%, var(--accent) 20%) !important;
+}
+
+/* Panels / cards */
+.filters-section,
+.page-header,
+.empty-state,
+.cart-summary,
+.cart-items,
+.order-card,
+.admin-guide,
+.review-guide,
+.review-timeline,
+.quick-links,
+.admin-order-detail > div,
+.order-detail > div,
+.book-detail .review-card,
+.book-detail .no-reviews,
+.book-detail .no-rating,
+.book-detail .rating-section,
+.book-detail .shelf-actions,
+.book-detail .buy-section {
+  background: var(--panel) !important;
+  border-color: var(--border) !important;
+  box-shadow: var(--shadow) !important;
+}
+
+/* Fix common inline white blocks in homepage sections */
+.hero-stats .stat-item,
+.features-section .feature-card,
+.review-showcase-card,
+.offer-banner,
+.similar-book-card {
+  background: var(--panel) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+
+/* Buttons */
+.btn,
+.btn.primary,
+.btn.secondary,
+.btn.btn-primary,
+.btn.btn-secondary {
+  border-radius: 12px;
+  border: 1px solid color-mix(in oklab, var(--border) 70%, var(--primary));
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.12);
+  font-family: Georgia, "Times New Roman", Times, serif;
+}
+
+.btn.primary,
+.btn.btn-primary {
+  background: linear-gradient(135deg, var(--primary), color-mix(in oklab, var(--primary) 65%, var(--accent)));
+  color: #fff;
+}
+
+.btn.secondary,
+.btn.btn-secondary {
+  background: color-mix(in oklab, var(--panel) 86%, var(--accent) 14%);
+  color: var(--text);
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+/* Links */
+a {
+  color: color-mix(in oklab, var(--primary) 88%, var(--text));
+}
+a:hover {
+  color: var(--primary-700);
+}
+
+/* Tables */
+table {
+  border-color: var(--border);
+}
+thead tr {
+  background: color-mix(in oklab, var(--panel) 82%, var(--accent) 18%) !important;
+}
+
+/* Book list items */
+.book-list-item {
+  background: var(--panel) !important;
+  border-color: var(--border) !important;
+}
+
+.book-list-badge {
+  background: color-mix(in oklab, var(--primary) 80%, var(--accent) 20%) !important;
+}
+
+/* Book detail */
+.book-detail .book-cover {
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  box-shadow: 0 18px 40px rgba(0,0,0,0.18);
+}
+
+.breadcrumb a {
+  color: color-mix(in oklab, var(--accent) 55%, var(--text)) !important;
+}
+
+/* Improve readability */
+.muted {
+  color: var(--muted) !important;
+}
+
+/* Homepage hero + login promotion */
+.homepage-hero {
+  margin: 12px 0 12px;
+  text-align: center;
+}
+
+.homepage-hero-title {
+  font-size: 40px;
+  font-weight: 800;
+  margin: 0;
+}
+
+.homepage-hero-subtitle {
+  font-size: 16px;
+  margin-top: 6px;
+}
+
+.login-promotion {
+  background: linear-gradient(135deg, color-mix(in oklab, var(--primary) 85%, var(--accent)), var(--accent));
+  color: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  margin: 20px auto;
+  max-width: 600px;
+  box-shadow: var(--shadow);
+}
+
+.login-promotion-title {
+  margin: 0 0 12px;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.login-promotion-text {
+  margin: 0 0 16px;
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+.login-perk-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.login-perk-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.login-promotion-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.login-cta {
+  padding: 10px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.login-cta-primary {
+  background: #ffffff;
+  color: var(--primary);
+}
+
+.login-cta-secondary {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Reduce excessive letter/word spacing từ các style cũ */
+body,
+h1, h2, h3, h4, h5, h6,
+p, span, a, li, label,
+button, input, textarea {
+  letter-spacing: normal !important;
+  word-spacing: normal !important;
+}
+
+/* Logo giữ hơi đậm hơn một chút nhưng không bị xé chữ */
+.brand,
+.brand-title {
+  letter-spacing: 0.2px !important;
+  word-spacing: normal !important;
+}
+
+/* Reduce harsh neon accents in dark */
+[data-theme="dark"] .cart-badge {
+  background: color-mix(in oklab, var(--primary) 65%, #000);
+  color: #fff;
+}
+
+/* Tone down neon nav buttons from header-elegant in classic mode */
+.site-header nav > a {
+  background: linear-gradient(135deg, color-mix(in oklab, var(--primary) 80%, #000), color-mix(in oklab, var(--accent) 70%, #000)) !important;
+  border-color: color-mix(in oklab, var(--border) 70%, var(--primary)) !important;
+  color: var(--header-text) !important;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.3) !important;
+}
+
+.site-header nav > a:hover {
+  background: linear-gradient(135deg, color-mix(in oklab, var(--accent) 80%, #000), color-mix(in oklab, var(--primary) 75%, #000)) !important;
+}
+

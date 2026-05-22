@@ -7,6 +7,7 @@
 </div>
 
 <form method="post" action="{{ url_for('admin_review_edit', review_id=review.id) }}" class="form" style="display:grid;grid-template-columns:1fr;gap:12px;max-width:920px">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
   <div>
     <label>Nội dung gốc</label>
     <div class="panel" style="padding:12px;border:1px solid var(--border);border-radius:8px;background:var(--panel)">

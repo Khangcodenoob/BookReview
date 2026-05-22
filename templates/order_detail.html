@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block title %}Đơn hàng #{{ order.id }}{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">Đơn hàng #{{ order.id }}</h1>
+  <p class="page-subtitle">{{ order.created_at.strftime('%d/%m/%Y %H:%M') if order.created_at else '' }}</p>
+</div>
+
+<div class="order-detail" style="max-width: 800px; margin: 0 auto;">
+  <div style="background: var(--panel); border-radius: 16px; border: 1px solid var(--border); padding: 24px; margin-bottom: 24px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+      <span style="padding: 6px 14px; border-radius: 8px; font-size: 14px; font-weight: 600;
+        {% if order.status == 'pending' %}background: #fef3c7; color: #92400e;
+        {% elif order.status == 'paid' %}background: #dbeafe; color: #1e40af;
+        {% elif order.status == 'shipped' %}background: #d1fae5; color: #065f46;
+        {% elif order.status == 'canceled' %}background: #fee2e2; color: #991b1b;
+        {% else %}background: var(--border); color: var(--text);{% endif %}">
+        {{ order.status }}
+      </span>
+      <div style="font-size: 24px; font-weight: 700; color: var(--primary);">{{ "{:,.0f}".format(order.total) }} VND</div>
+    </div>
+
+    <table style="width: 100%; border-collapse: collapse;">
+      <thead>
+        <tr style="border-bottom: 2px solid var(--border);">
+          <th style="text-align: left; padding: 12px 0; color: var(--muted); font-weight: 600;">Sản phẩm</th>
+          <th style="text-align: right; padding: 12px 0; color: var(--muted); font-weight: 600;">Đơn giá</th>
+          <th style="text-align: center; padding: 12px 0; color: var(--muted); font-weight: 600;">SL</th>
+          <th style="text-align: right; padding: 12px 0; color: var(--muted); font-weight: 600;">Thành tiền</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in order.items %}
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding: 16px 0;">{{ item.title_snapshot }}</td>
+          <td style="text-align: right; padding: 16px 0;">{{ "{:,.0f}".format(item.unit_price) }} VND</td>
+          <td style="text-align: center; padding: 16px 0;">{{ item.quantity }}</td>
+          <td style="text-align: right; padding: 16px 0; font-weight: 600;">{{ "{:,.0f}".format(item.line_total) }} VND</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid var(--border);">
+      <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+        <span style="color: var(--muted);">Tạm tính:</span>
+        <span>{{ "{:,.0f}".format(order.subtotal) }} VND</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+        <span style="color: var(--muted);">Phí vận chuyển:</span>
+        <span>{{ "{:,.0f}".format(order.shipping_fee) }} VND</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; font-size: 18px; font-weight: 700;">
+        <span>Tổng cộng:</span>
+        <span style="color: var(--primary);">{{ "{:,.0f}".format(order.total) }} VND</span>
+      </div>
+    </div>
+  </div>
+
+  <a href="{{ url_for('my_orders') }}" class="btn secondary">Quay lại danh sách đơn</a>
+</div>
+{% endblock %}

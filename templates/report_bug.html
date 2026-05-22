@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Báo cáo lỗi - Chạm Sách{% endblock %}
+
+{% block content %}
+<div class="auth-container" style="max-width: 600px; margin: 40px auto; padding: 0 20px;">
+  <div class="auth-card" style="width: 100%; max-width: 100%;">
+    <div class="auth-header">
+      <h2>Báo cáo lỗi</h2>
+      <p>Cảm ơn bạn đã giúp Chạm Sách trở nên tốt hơn!</p>
+    </div>
+    
+    <form method="post" class="form auth-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+      
+      <div class="form-group">
+        <label for="name" class="form-label">Họ tên / Username</label>
+        <input type="text" id="name" name="name" class="form-input" placeholder="Nhập tên của bạn" required {% if current_user.is_authenticated %}value="{{ current_user.username }}"{% endif %}>
+      </div>
+      
+      <div class="form-group">
+        <label for="email" class="form-label">Email</label>
+        <input type="email" id="email" name="email" class="form-input" placeholder="Nhập email liên hệ" required {% if current_user.is_authenticated %}value="{{ current_user.email }}"{% endif %}>
+      </div>
+      
+      <div class="form-group">
+        <label for="title" class="form-label">Tiêu đề lỗi</label>
+        <input type="text" id="title" name="title" class="form-input" placeholder="Tóm tắt ngắn gọn lỗi gặp phải" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="description" class="form-label">Mô tả lỗi</label>
+        <textarea id="description" name="description" class="form-input" rows="4" placeholder="Mô tả chi tiết những gì bạn thấy" required style="resize: vertical; min-height: 100px;"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="steps" class="form-label">Các bước tái hiện (Tùy chọn)</label>
+        <textarea id="steps" name="steps" class="form-input" rows="3" placeholder="Ví dụ: 1. Vào trang Sách > 2. Bấm tìm kiếm > 3. Bị văng..." style="resize: vertical; min-height: 80px;"></textarea>
+      </div>
+      
+      <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 16px;">Gửi báo cáo</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

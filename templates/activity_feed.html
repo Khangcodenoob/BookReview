@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+{% block title %}Feed hoạt động{% endblock %}
+{% block content %}
+<div class="activity-feed-page">
+  <div class="page-header" style="text-align: center; margin-bottom: 40px;">
+    <h1>📱 Feed hoạt động</h1>
+    <p class="muted">Theo dõi hoạt động của bạn bè và cộng đồng</p>
+  </div>
+
+  <div class="feed-container" style="max-width: min(90vw, 1400px); margin: 0 auto; padding: 0 16px;">
+    {% if activities %}
+      <div class="feed-list" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 20px; align-items: start;">
+      {% for activity in activities %}
+      <div class="activity-item" style="background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px; transition: all 0.2s;">
+        <div class="activity-header" style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+          <div class="user-avatar" style="width: 40px; height: 40px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; color: #06210e; font-size: 18px; font-weight: 600;">
+            {{ activity.username[0].upper() }}
+          </div>
+          <div class="activity-info" style="flex: 1;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+              <strong style="color: var(--text);">{{ activity.username }}</strong>
+              <span class="activity-type" style="font-size: 12px; color: var(--text-secondary);">
+                {% if activity.activity_type == 'review' %}
+                  ⭐ đã đánh giá
+                {% elif activity.activity_type == 'shelf_add' %}
+                  📚 đã thêm vào kệ
+                {% elif activity.activity_type == 'shelf_move' %}
+                  🔄 đã chuyển kệ
+                {% elif activity.activity_type == 'follow' %}
+                  👥 đã follow
+                {% endif %}
+              </span>
+            </div>
+            <div class="activity-time" style="font-size: 12px; color: var(--text-secondary);">
+              {{ activity.created_at[:16] }}
+            </div>
+          </div>
+        </div>
+
+        <div class="activity-content">
+          {% if activity.activity_type == 'review' and activity.book_title %}
+          <div class="book-activity" style="display: flex; gap: 12px; align-items: flex-start;">
+            <img src="{{ activity.book_cover or url_for('static', filename='placeholder.jpg') }}" 
+                 alt="{{ activity.book_title }}" 
+                 style="width: 60px; height: 80px; object-fit: cover; border-radius: 6px; flex-shrink: 0;">
+            <div style="flex: 1;">
+              <h3 style="margin: 0 0 4px 0; font-size: 16px; font-weight: 600;">
+                <a href="{{ url_for('book_detail', book_id=activity.target_id) }}" style="color: var(--text); text-decoration: none;">{{ activity.book_title }}</a>
+              </h3>
+              <div class="rating" style="color: #fbbf24; font-size: 14px; margin-bottom: 8px;">
+                {% if activity.metadata %}
+                  {% set rating = activity.metadata.split(' ')[-1] %}
+                  {% if rating.isdigit() %}
+                    {{ '★' * rating|int }}{{ '☆' * (5 - rating|int) }} {{ rating }}/5
+                  {% endif %}
+                {% endif %}
+              </div>
+              {% if activity.metadata and 'reviewed' in activity.metadata %}
+              <p style="margin: 0; color: var(--text-secondary); font-size: 14px; line-height: 1.4;">
+                "{{ activity.metadata.split('reviewed')[1].strip() if 'reviewed' in activity.metadata else 'Đã viết đánh giá' }}"
+              </p>
+              {% endif %}
+            </div>
+          </div>
+
+          {% elif activity.activity_type in ['shelf_add', 'shelf_move'] and activity.book_title %}
+          <div class="book-activity" style="display: flex; gap: 12px; align-items: flex-start;">
+            <img src="{{ activity.book_cover or url_for('static', filename='placeholder.jpg') }}" 
+                 alt="{{ activity.book_title }}" 
+                 style="width: 60px; height: 80px; object-fit: cover; border-radius: 6px; flex-shrink: 0;">
+            <div style="flex: 1;">
+              <h3 style="margin: 0 0 4px 0; font-size: 16px; font-weight: 600;">
+                <a href="{{ url_for('book_detail', book_id=activity.target_id) }}" style="color: var(--text); text-decoration: none;">{{ activity.book_title }}</a>
+              </h3>
+              <p style="margin: 0; color: var(--text-secondary); font-size: 14px;">
+                {% if activity.activity_type == 'shelf_add' %}
+                  Đã thêm vào kệ 
+                  {% if 'want_to_read' in activity.metadata %}📋 Muốn đọc
+                  {% elif 'reading' in activity.metadata %}📚 Đang đọc
+                  {% elif 'read' in activity.metadata %}📖 Đã đọc
+                  {% endif %}
+                {% elif activity.activity_type == 'shelf_move' %}
+                  Đã chuyển sang kệ 
+                  {% if 'want_to_read' in activity.metadata %}📋 Muốn đọc
+                  {% elif 'reading' in activity.metadata %}📚 Đang đọc
+                  {% elif 'read' in activity.metadata %}📖 Đã đọc
+                  {% endif %}
+                {% endif %}
+              </p>
+            </div>
+          </div>
+
+                {% elif activity.activity_type == 'follow' %}
+          <div class="follow-activity" style="display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--bg); border-radius: 8px;">
+            <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; color: #06210e; font-size: 18px;">
+              👥
+            </div>
+            <div>
+              <p style="margin: 0; color: var(--text); font-weight: 500;">
+                Đã follow một người dùng mới
+              </p>
+              <p style="margin: 0; color: var(--text-secondary); font-size: 12px;">
+                {{ activity.metadata if activity.metadata else 'Followed a new user' }}
+              </p>
+            </div>
+          </div>
+
+          {% elif activity.activity_type == 'challenge_complete' %}
+          <div class="challenge-complete-activity" style="display: flex; align-items: center; gap: 12px; padding: 12px; background: linear-gradient(135deg, #10b981, #059669); border-radius: 8px; color: white;">
+            <div style="width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 18px;">
+              🏆
+            </div>
+            <div>
+              <p style="margin: 0; font-weight: 600;">
+                🎉 Đã hoàn thành thử thách!
+              </p>
+              <p style="margin: 0; font-size: 12px; opacity: 0.9;">
+                {{ activity.challenge_title if activity.challenge_title else 'Thử thách đọc review' }}
+              </p>
+            </div>
+          </div>
+
+          {% else %}
+          <div class="generic-activity" style="padding: 12px; background: var(--bg); border-radius: 8px;">
+            <p style="margin: 0; color: var(--text-secondary);">
+              {{ activity.metadata if activity.metadata else 'Hoạt động mới' }}
+            </p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-feed" style="text-align: center; padding: 60px 20px; color: var(--muted);">
+        <div style="font-size: 64px; margin-bottom: 20px;">📱</div>
+        <h3 style="margin: 0 0 12px 0; color: var(--text);">Feed trống</h3>
+        <p style="margin: 0 0 20px 0;">Chưa có hoạt động nào để hiển thị.</p>
+        <p style="margin: 0 0 20px 0; color: var(--text-secondary);">
+          Hãy follow một số người dùng để xem hoạt động của họ!
+        </p>
+        <a href="{{ url_for('books_list') }}" class="btn" style="margin-right: 12px;">Khám phá sách</a>
+        <a href="{{ url_for('profile') }}" class="btn secondary">Xem hồ sơ</a>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="quick-actions" style="position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 12px;">
+    <a href="{{ url_for('books_list') }}" class="quick-action-btn" style="width: 56px; height: 56px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #06210e; text-decoration: none; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: all 0.2s;" title="Khám phá sách">
+      📚
+    </a>
+    <a href="{{ url_for('my_shelves') }}" class="quick-action-btn" style="width: 56px; height: 56px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #06210e; text-decoration: none; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: all 0.2s;" title="Kệ sách">
+      📖
+    </a>
+  </div>
+</div>
+
+<style>
+.activity-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.quick-action-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+}
+
+@media (max-width: 768px) {
+  .quick-actions {
+    bottom: 10px;
+    right: 10px;
+  }
+  
+  .quick-action-btn {
+    width: 48px !important;
+    height: 48px !important;
+  }
+}
+</style>
+{% endblock %}

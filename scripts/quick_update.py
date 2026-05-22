@@ -1,9 +1,14 @@
 import sqlite3
+import os
 
-conn = sqlite3.connect('books.db')
+# Get the project root directory
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DB_PATH = os.path.join(BASE_DIR, 'books.db')
+
+conn = sqlite3.connect(DB_PATH)
 cursor = conn.cursor()
 
-# Cập nhật một số sách quan trọng
+# Update some important books
 updates = [
     ("Những người khốn khổ", "https://covers.openlibrary.org/b/isbn/9780140444308-L.jpg"),
     ("1984", "https://covers.openlibrary.org/b/isbn/9780451524935-L.jpg"),

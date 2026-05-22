@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% block title %}Thử thách đọc sách{% endblock %}
+{% block content %}
+<div class="challenges-page">
+  <div class="page-header" style="text-align: center; margin-bottom: 40px;">
+    <h1>🏆 Thử thách đọc review</h1>
+    <p class="muted">Tham gia các thử thách để khám phá nhiều review sách hay</p>
+  </div>
+
+  <div class="challenges-container" style="max-width: 1000px; margin: 0 auto;">
+    {% if challenges %}
+    <div class="challenges-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 24px;">
+      {% for challenge in challenges %}
+      <div class="challenge-card" style="background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 24px; transition: all 0.3s; position: relative; overflow: hidden;">
+        <!-- Challenge Type Badge -->
+        <div class="challenge-badge" style="position: absolute; top: 16px; right: 16px; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; text-transform: uppercase;">
+          {% if challenge.challenge_type == 'yearly' %}
+            <span style="background: linear-gradient(135deg, #10b981, #059669); color: white;">📅 Năm</span>
+          {% elif challenge.challenge_type == 'monthly' %}
+            <span style="background: linear-gradient(135deg, #3b82f6, #2563eb); color: white;">📆 Tháng</span>
+          {% elif challenge.challenge_type == 'weekly' %}
+            <span style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white;">📅 Tuần</span>
+          {% else %}
+            <span style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white;">🎯 Tùy chỉnh</span>
+          {% endif %}
+        </div>
+
+        <div class="challenge-content">
+          <h2 style="margin: 0 0 12px 0; font-size: 20px; font-weight: 700; color: var(--text); line-height: 1.3;">
+            {{ challenge.title }}
+          </h2>
+          
+          <p style="margin: 0 0 16px 0; color: var(--text-secondary); line-height: 1.5;">
+            {{ challenge.description }}
+          </p>
+
+          <!-- Progress Section -->
+          {% if challenge.is_joined %}
+          <div class="progress-section" style="margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-weight: 600; color: var(--text);">Tiến độ đọc review</span>
+              <span style="font-size: 14px; color: var(--text-secondary);">
+                {{ user_progress[challenge.id].current }}/{{ user_progress[challenge.id].target }} review
+              </span>
+            </div>
+            <div style="width: 100%; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden;">
+              <div style="width: {{ user_progress[challenge.id].progress }}%; height: 100%; background: linear-gradient(90deg, var(--primary), var(--accent)); transition: width 0.3s;"></div>
+            </div>
+            <div style="text-align: center; margin-top: 8px;">
+              <span style="font-size: 12px; color: var(--text-secondary);">
+                {{ user_progress[challenge.id].progress|round(1) }}% hoàn thành
+              </span>
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- Challenge Stats -->
+          <div class="challenge-stats" style="display: flex; justify-content: space-between; margin-bottom: 20px; padding: 12px; background: var(--bg); border-radius: 8px;">
+            <div style="text-align: center;">
+              <div style="font-size: 18px; font-weight: 700; color: var(--primary);">{{ challenge.target_count }}</div>
+              <div style="font-size: 11px; color: var(--text-secondary);">Mục tiêu</div>
+            </div>
+            <div style="text-align: center;">
+              <div style="font-size: 18px; font-weight: 700; color: var(--accent);">{{ challenge.participants_count }}</div>
+              <div style="font-size: 11px; color: var(--text-secondary);">Tham gia</div>
+            </div>
+            <div style="text-align: center;">
+              <div style="font-size: 18px; font-weight: 700; color: #10b981;">{{ challenge.end_date[:10] }}</div>
+              <div style="font-size: 11px; color: var(--text-secondary);">Kết thúc</div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="challenge-actions" style="display: flex; gap: 8px;">
+            {% if challenge.is_joined %}
+              <form method="post" action="{{ url_for('leave_challenge', challenge_id=challenge.id) }}" style="flex: 1;">
+                <button type="submit" class="btn secondary" style="width: 100%; padding: 10px; font-size: 14px; background: #ef4444; color: white; border: none;">
+                  🚪 Rời khỏi
+                </button>
+              </form>
+              <a href="{{ url_for('my_challenges') }}" class="btn" style="flex: 1; padding: 10px; font-size: 14px; text-align: center; text-decoration: none;">
+                📊 Xem tiến độ
+              </a>
+            {% else %}
+              <form method="post" action="{{ url_for('join_challenge', challenge_id=challenge.id) }}" style="flex: 1;">
+                <button type="submit" class="btn" style="width: 100%; padding: 10px; font-size: 14px;">
+                  🎯 Tham gia
+                </button>
+              </form>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state" style="text-align: center; padding: 60px 20px; color: var(--muted);">
+      <div style="font-size: 64px; margin-bottom: 20px;">🏆</div>
+      <h3 style="margin: 0 0 12px 0; color: var(--text);">Chưa có thử thách nào</h3>
+      <p style="margin: 0 0 20px 0;">Hiện tại chưa có thử thách đọc sách nào.</p>
+      <p style="margin: 0 0 20px 0; color: var(--text-secondary);">
+        Hãy quay lại sau để xem các thử thách mới!
+      </p>
+      <a href="{{ url_for('books_list') }}" class="btn" style="margin-right: 12px;">Khám phá sách</a>
+      <a href="{{ url_for('my_shelves') }}" class="btn secondary">Quản lý kệ sách</a>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Quick Stats -->
+  {% if current_user.id %}
+  <div class="quick-stats" style="margin-top: 40px; padding: 24px; background: var(--panel); border: 1px solid var(--border); border-radius: 12px; text-align: center;">
+    <h3 style="margin: 0 0 16px 0; color: var(--text);">📈 Thống kê thử thách của bạn</h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px;">
+      <div class="stat-item" style="padding: 16px; background: var(--bg); border-radius: 8px;">
+        <div style="font-size: 24px; font-weight: 700; color: var(--primary); margin-bottom: 4px;">
+          {{ challenges|selectattr('is_joined')|list|length }}
+        </div>
+        <div style="font-size: 12px; color: var(--text-secondary);">Đang tham gia</div>
+      </div>
+      <div class="stat-item" style="padding: 16px; background: var(--bg); border-radius: 8px;">
+        <div style="font-size: 24px; font-weight: 700; color: var(--accent); margin-bottom: 4px;">
+          {{ challenges|length }}
+        </div>
+        <div style="font-size: 12px; color: var(--text-secondary);">Tổng thử thách</div>
+      </div>
+      <div class="stat-item" style="padding: 16px; background: var(--bg); border-radius: 8px;">
+        <div style="font-size: 24px; font-weight: 700; color: #10b981; margin-bottom: 4px;">
+          {{ user_progress.values()|sum(attribute='current') if user_progress else 0 }}
+        </div>
+        <div style="font-size: 12px; color: var(--text-secondary);">Review đã đọc</div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<style>
+.challenge-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+}
+
+.challenge-card {
+  background: linear-gradient(135deg, var(--panel) 0%, rgba(255,255,255,0.02) 100%);
+}
+
+@media (max-width: 768px) {
+  .challenges-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .challenge-actions {
+    flex-direction: column !important;
+  }
+}
+</style>
+{% endblock %}

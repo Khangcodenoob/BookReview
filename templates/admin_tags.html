@@ -4,6 +4,7 @@
 <div class="admin-header">
   <h2>Tags</h2>
   <form method="post" action="{{ url_for('admin_tags_new') }}" class="form" style="grid-template-columns:1fr auto;align-items:end;max-width:420px">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
     <label>Tên tag
       <input name="name" required placeholder="VD: cổ điển">
     </label>
@@ -24,12 +25,14 @@
       <td>{{ t.name }}</td>
       <td style="text-align:right">
         <form method="post" action="{{ url_for('admin_tags_delete', tag_id=t.id) }}" onsubmit="return confirm('Xoá tag này?')">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
           <button class="btn secondary" type="submit">Xoá</button>
         </form>
       </td>
     </tr>
     {% endfor %}
   </tbody>
+</table>
 {% endblock %}
 
 

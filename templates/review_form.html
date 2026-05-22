@@ -2,12 +2,7 @@
 {% block title %}Viết đánh giá - {{ book.title }}{% endblock %}
 {% block content %}
 
-<!-- Debug Information (remove in production) -->
-{% if book %}
-<div>
-  Debug Info: {{ book.title }}
-</div>
-{% else %}
+{% if not book %}
 <div style="background: #ffebee; padding: 10px; margin: 10px 0; border-radius: 5px; font-size: 12px;">
   <strong>Error:</strong> No book data found!
 </div>
@@ -40,6 +35,7 @@
 <!-- Review Form -->
 <div class="review-form-container" style="max-width: 800px; margin: 0 auto;">
   <form method="post" action="{{ url_for('create_review', book_id=book.id) }}" class="review-form" id="reviewForm">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
     
     <!-- Reviewer Section -->
     <div class="form-section" style="background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 20px; box-shadow: var(--shadow);">

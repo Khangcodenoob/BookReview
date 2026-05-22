@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block title %}Câu hỏi thường gặp - Chạm Sách{% endblock %}
+
+{% block content %}
+<div class="support-container">
+  <div class="support-header">
+    <h1>Câu hỏi thường gặp (FAQ)</h1>
+    <p>Tổng hợp các câu hỏi và giải đáp nhanh cho các vấn đề bạn có thể gặp phải.</p>
+  </div>
+
+  <div class="faq-list">
+    <!-- FAQ Item 1 -->
+    <div class="faq-item">
+      <button class="faq-question">
+        Làm sao để đăng review?
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Để đăng review, bạn cần tạo tài khoản và đăng nhập. Sau đó, truy cập vào trang chi tiết của cuốn sách bạn muốn đánh giá, nhập nội dung, chọn số sao và nhấn "Gửi đánh giá".
+        </div>
+      </div>
+    </div>
+
+    <!-- FAQ Item 2 -->
+    <div class="faq-item">
+      <button class="faq-question">
+        Vì sao review của tôi chưa hiển thị?
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Thông thường review sẽ hiển thị ngay lập tức. Tuy nhiên, nếu hệ thống phát hiện ngôn từ không phù hợp hoặc nghi ngờ spam, review có thể bị ẩn để chờ quản trị viên kiểm duyệt. Quá trình kiểm duyệt thường mất từ 1-2 ngày làm việc.
+        </div>
+      </div>
+    </div>
+
+    <!-- FAQ Item 3 -->
+    <div class="faq-item">
+      <button class="faq-question">
+        Làm sao đổi avatar?
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Hiện tại tính năng tải lên avatar tùy chỉnh đang được phát triển. Tạm thời, hệ thống sẽ sử dụng ảnh đại diện mặc định dựa trên tên tài khoản của bạn.
+        </div>
+      </div>
+    </div>
+
+    <!-- FAQ Item 4 -->
+    <div class="faq-item">
+      <button class="faq-question">
+        Làm sao lưu sách yêu thích?
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Trong trang chi tiết của mỗi cuốn sách, có một nút "Lưu sách" (biểu tượng thẻ đánh dấu). Hãy nhấp vào đó để lưu sách vào "Kệ sách" cá nhân của bạn.
+        </div>
+      </div>
+    </div>
+
+    <!-- FAQ Item 5 -->
+    <div class="faq-item">
+      <button class="faq-question">
+        Quên mật khẩu thì làm gì?
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Vui lòng nhấp vào liên kết "Quên mật khẩu?" trên trang Đăng nhập. Hệ thống sẽ gửi một email hướng dẫn cách đặt lại mật khẩu đến địa chỉ email bạn đã đăng ký.
+        </div>
+      </div>
+    </div>
+
+    <!-- FAQ Item 6 -->
+    <div class="faq-item">
+      <button class="faq-question">
+        Làm sao báo cáo nội dung sai hoặc vi phạm?
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Nếu bạn phát hiện thông tin sách bị sai lệch hoặc có người dùng đăng bình luận xúc phạm, vi phạm bản quyền, hãy truy cập trang <strong>Báo cáo lỗi</strong> hoặc <strong>Liên hệ quản trị viên</strong> để gửi thông tin cho chúng tôi xử lý.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const questions = document.querySelectorAll('.faq-question');
+    questions.forEach(question => {
+      question.addEventListener('click', () => {
+        const item = question.closest('.faq-item');
+        const answer = item.querySelector('.faq-answer');
+        
+        // Toggle active class
+        item.classList.toggle('active');
+        
+        // Toggle max-height for animation
+        if (item.classList.contains('active')) {
+          answer.style.maxHeight = answer.scrollHeight + 'px';
+        } else {
+          answer.style.maxHeight = '0';
+        }
+      });
+    });
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,246 @@
+{% extends 'base.html' %}
+{% block title %}{{ user.username }} - Hồ sơ{% endblock %}
+{% block content %}
+<div class="user-profile-page">
+  <!-- Profile Header -->
+  <div class="profile-header" style="background: linear-gradient(135deg, var(--primary), var(--accent)); color: #06210e; padding: 40px 0; margin: -20px -20px 30px -20px; border-radius: 0 0 20px 20px; position: relative; overflow: hidden;">
+    <div class="profile-header-bg" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(45deg, rgba(255,255,255,0.1) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.1) 75%), linear-gradient(45deg, rgba(255,255,255,0.1) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.1) 75%); background-size: 20px 20px; background-position: 0 0, 10px 10px; opacity: 0.3;"></div>
+    
+    <div class="container" style="position: relative; z-index: 1;">
+      <div class="profile-info" style="display: flex; align-items: center; gap: 24px; flex-wrap: wrap;">
+        <!-- Avatar Section -->
+        <div class="avatar-section" style="position: relative;">
+          <div class="avatar-container" style="width: 120px; height: 120px; border-radius: 50%; overflow: hidden; border: 4px solid rgba(255,255,255,0.3); background: var(--panel); display: flex; align-items: center; justify-content: center; position: relative; box-shadow: 0 8px 32px rgba(0,0,0,0.2);">
+            <div style="color: var(--muted); font-size: 48px; font-weight: 300;">👤</div>
+          </div>
+        </div>
+
+        <!-- User Info -->
+        <div class="user-details" style="flex: 1; min-width: 200px;">
+          <h1 style="margin: 0 0 8px 0; font-size: 32px; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.1);">{{ user.username }}</h1>
+          <div class="user-badges" style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
+            <span class="role-badge" style="background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+              {{ user.role }}
+            </span>
+            <span class="member-badge" style="background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">
+              📚 Thành viên từ {{ user.created_at[:10] }}
+            </span>
+          </div>
+          
+          <!-- Follow Button -->
+          {% if current_user.id and current_user.id != user.id %}
+          <div style="margin-bottom: 16px;">
+            <form method="post" action="{{ url_for('follow_user', user_id=user.id) }}" style="display: inline;">
+              <button type="submit" class="btn" style="background: rgba(255,255,255,0.2); color: #06210e; border: 2px solid rgba(255,255,255,0.3); padding: 8px 20px; border-radius: 20px; font-weight: 600;">
+                {% if is_following %}👥 Đang follow{% else %}➕ Follow{% endif %}
+              </button>
+            </form>
+          </div>
+          {% endif %}
+          
+          <div class="user-stats" style="display: flex; gap: 24px; margin-top: 16px;">
+            <div class="stat-item" style="text-align: center;">
+              <div class="stat-number" style="font-size: 24px; font-weight: 700; margin-bottom: 4px;">{{ followers_count }}</div>
+              <div class="stat-label" style="font-size: 12px; opacity: 0.8;">Followers</div>
+            </div>
+            <div class="stat-item" style="text-align: center;">
+              <div class="stat-number" style="font-size: 24px; font-weight: 700; margin-bottom: 4px;">{{ following_count }}</div>
+              <div class="stat-label" style="font-size: 12px; opacity: 0.8;">Following</div>
+            </div>
+            <div class="stat-item" style="text-align: center;">
+              <div class="stat-number" style="font-size: 24px; font-weight: 700; margin-bottom: 4px;">{{ read_books|length + reading_books|length + want_to_read_books|length }}</div>
+              <div class="stat-label" style="font-size: 12px; opacity: 0.8;">Sách trong kệ</div>
+            </div>
+            <div class="stat-item" style="text-align: center;">
+              <div class="stat-number" style="font-size: 24px; font-weight: 700; margin-bottom: 4px;">{{ recent_reviews|length }}</div>
+              <div class="stat-label" style="font-size: 12px; opacity: 0.8;">Đánh giá</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile Navigation -->
+  <div class="profile-nav" style="margin-bottom: 30px;">
+    <div class="nav-tabs" style="display: flex; gap: 4px; background: var(--panel); padding: 4px; border-radius: 12px; border: 1px solid var(--border);">
+      <button class="nav-tab active" data-tab="shelves" style="flex: 1; padding: 12px 16px; border: none; background: var(--primary); color: #06210e; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+        📖 Kệ sách
+      </button>
+      <button class="nav-tab" data-tab="reviews" style="flex: 1; padding: 12px 16px; border: none; background: transparent; color: var(--text); border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+        ⭐ Đánh giá
+      </button>
+    </div>
+  </div>
+
+  <!-- Tab Content -->
+  <div class="tab-content">
+    <!-- Shelves Tab -->
+    <div id="shelves-tab" class="tab-panel active">
+      <div class="shelves-grid" style="display: grid; gap: 30px;">
+        <!-- Want to Read Shelf -->
+        <div class="shelf-section">
+          <div class="shelf-header" style="text-align: center; margin-bottom: 20px;">
+            <h2 style="margin: 0 0 8px 0; color: var(--text);">📋 Muốn đọc ({{ want_to_read_books|length }})</h2>
+            <p class="muted">Sách {{ user.username }} muốn đọc trong tương lai</p>
+          </div>
+          {% if want_to_read_books %}
+          <div class="books-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px;">
+            {% for book in want_to_read_books %}
+            <div class="book-card" style="background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 12px; transition: transform 0.2s;">
+              <a href="{{ url_for('book_detail', book_id=book.id) }}" style="text-decoration: none; color: inherit;">
+                <img src="{{ book.cover_url or url_for('static', filename='placeholder.jpg') }}" 
+                     alt="{{ book.title }}" class="book-cover" style="width: 100%; height: 180px; object-fit: cover; border-radius: 6px; margin-bottom: 8px;">
+                <h3 style="margin: 0 0 4px 0; font-size: 13px; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ book.title }}</h3>
+                <p style="margin: 0; font-size: 11px; color: var(--text-secondary);">{{ book.author }}</p>
+              </a>
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <div class="empty-shelf" style="text-align: center; padding: 40px 20px; color: var(--text-secondary);">
+            <div style="font-size: 48px; margin-bottom: 16px;">📋</div>
+            <p>Chưa có sách nào trong kệ này.</p>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Currently Reading Shelf -->
+        <div class="shelf-section">
+          <div class="shelf-header" style="text-align: center; margin-bottom: 20px;">
+            <h2 style="margin: 0 0 8px 0; color: var(--text);">📚 Đang đọc ({{ reading_books|length }})</h2>
+            <p class="muted">Sách {{ user.username }} đang đọc hiện tại</p>
+          </div>
+          {% if reading_books %}
+          <div class="books-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px;">
+            {% for book in reading_books %}
+            <div class="book-card" style="background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 12px; transition: transform 0.2s;">
+              <a href="{{ url_for('book_detail', book_id=book.id) }}" style="text-decoration: none; color: inherit;">
+                <img src="{{ book.cover_url or url_for('static', filename='placeholder.jpg') }}" 
+                     alt="{{ book.title }}" class="book-cover" style="width: 100%; height: 180px; object-fit: cover; border-radius: 6px; margin-bottom: 8px;">
+                <h3 style="margin: 0 0 4px 0; font-size: 13px; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ book.title }}</h3>
+                <p style="margin: 0; font-size: 11px; color: var(--text-secondary);">{{ book.author }}</p>
+              </a>
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <div class="empty-shelf" style="text-align: center; padding: 40px 20px; color: var(--text-secondary);">
+            <div style="font-size: 48px; margin-bottom: 16px;">📚</div>
+            <p>Chưa có sách nào trong kệ này.</p>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Read Shelf -->
+        <div class="shelf-section">
+          <div class="shelf-header" style="text-align: center; margin-bottom: 20px;">
+            <h2 style="margin: 0 0 8px 0; color: var(--text);">📖 Đã đọc ({{ read_books|length }})</h2>
+            <p class="muted">Sách {{ user.username }} đã hoàn thành</p>
+          </div>
+          {% if read_books %}
+          <div class="books-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px;">
+            {% for book in read_books %}
+            <div class="book-card" style="background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 12px; transition: transform 0.2s;">
+              <a href="{{ url_for('book_detail', book_id=book.id) }}" style="text-decoration: none; color: inherit;">
+                <img src="{{ book.cover_url or url_for('static', filename='placeholder.jpg') }}" 
+                     alt="{{ book.title }}" class="book-cover" style="width: 100%; height: 180px; object-fit: cover; border-radius: 6px; margin-bottom: 8px;">
+                <h3 style="margin: 0 0 4px 0; font-size: 13px; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ book.title }}</h3>
+                <p style="margin: 0; font-size: 11px; color: var(--text-secondary);">{{ book.author }}</p>
+              </a>
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <div class="empty-shelf" style="text-align: center; padding: 40px 20px; color: var(--text-secondary);">
+            <div style="font-size: 48px; margin-bottom: 16px;">📖</div>
+            <p>Chưa có sách nào trong kệ này.</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Reviews Tab -->
+    <div id="reviews-tab" class="tab-panel" style="display: none;">
+      <div class="section-header" style="margin-bottom: 20px;">
+        <h2 style="margin: 0; color: var(--text);">⭐ Đánh giá gần đây</h2>
+      </div>
+      
+      <div class="reviews-container">
+      {% for review in recent_reviews %}
+        <div class="review-card" style="background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 16px; transition: all 0.2s;">
+          <div class="review-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+            <div>
+              <h3 style="margin: 0 0 4px 0; font-size: 18px; font-weight: 600;">
+                <a href="{{ url_for('book_detail', book_id=review.book_id) }}" style="color: var(--text); text-decoration: none;">{{ review.book_title }}</a>
+              </h3>
+              <p style="margin: 0; color: var(--muted); font-size: 14px;">{{ review.created_at.strftime('%d/%m/%Y') }}</p>
+            </div>
+            <div class="review-rating" style="display: flex; align-items: center; gap: 8px;">
+              <div class="stars" style="color: #fbbf24; font-size: 18px;">{{ '★' * review.rating }}{{ '☆' * (5 - review.rating) }}</div>
+              <span style="font-weight: 600; color: var(--text);">{{ review.rating }}/5</span>
+            </div>
+          </div>
+          {% if review.content %}
+          <div class="review-content" style="color: var(--text); line-height: 1.5; margin-bottom: 12px;">
+            {{ review.content[:200] }}{% if review.content|length > 200 %}...{% endif %}
+          </div>
+          {% endif %}
+        </div>
+      {% else %}
+        <div class="empty-state" style="text-align: center; padding: 60px 20px; color: var(--muted);">
+          <div style="font-size: 48px; margin-bottom: 16px;">⭐</div>
+          <h3 style="margin: 0 0 8px 0; color: var(--text);">Chưa có đánh giá nào</h3>
+          <p style="margin: 0;">{{ user.username }} chưa viết đánh giá nào.</p>
+        </div>
+      {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Tab switching
+document.addEventListener('DOMContentLoaded', function() {
+  const tabs = document.querySelectorAll('.nav-tab');
+  const panels = document.querySelectorAll('.tab-panel');
+  
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const targetTab = tab.getAttribute('data-tab');
+      
+      // Update tab buttons
+      tabs.forEach(t => {
+        t.classList.remove('active');
+        t.style.background = 'transparent';
+        t.style.color = 'var(--text)';
+      });
+      tab.classList.add('active');
+      tab.style.background = 'var(--primary)';
+      tab.style.color = '#06210e';
+      
+      // Update panels
+      panels.forEach(panel => {
+        panel.classList.remove('active');
+        panel.style.display = 'none';
+      });
+      document.getElementById(targetTab + '-tab').classList.add('active');
+      document.getElementById(targetTab + '-tab').style.display = 'block';
+    });
+  });
+  
+  // Hover effects for book cards
+  const bookCards = document.querySelectorAll('.book-card');
+  bookCards.forEach(card => {
+    card.addEventListener('mouseenter', () => {
+      card.style.transform = 'translateY(-2px)';
+    });
+    
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = 'translateY(0)';
+    });
+  });
+});
+</script>
+{% endblock %}

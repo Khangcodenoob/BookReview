@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+{% block title %}Thử thách của tôi{% endblock %}
+{% block content %}
+<div class="my-challenges-page">
+  <div class="page-header" style="text-align: center; margin-bottom: 40px;">
+    <h1>🏆 Thử thách của tôi</h1>
+    <p class="muted">Theo dõi tiến độ đọc review trong các thử thách</p>
+  </div>
+
+  <div class="challenges-container" style="max-width: 1000px; margin: 0 auto;">
+    {% if challenges %}
+    <div class="challenges-list" style="display: flex; flex-direction: column; gap: 20px;">
+      {% for challenge in challenges %}
+      <div class="challenge-item" style="background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 24px; transition: all 0.3s; position: relative;">
+        <!-- Completion Badge -->
+        {% if challenge.is_completed %}
+        <div class="completion-badge" style="position: absolute; top: 16px; right: 16px; padding: 6px 12px; background: linear-gradient(135deg, #10b981, #059669); color: white; border-radius: 20px; font-size: 12px; font-weight: 600;">
+          ✅ Hoàn thành
+        </div>
+        {% endif %}
+
+        <div class="challenge-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+          <div style="flex: 1;">
+            <h2 style="margin: 0 0 8px 0; font-size: 20px; font-weight: 700; color: var(--text);">
+              {{ challenge.title }}
+            </h2>
+            <p style="margin: 0; color: var(--text-secondary); font-size: 14px;">
+              {{ challenge.description }}
+            </p>
+          </div>
+          <div class="challenge-type" style="padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; text-transform: uppercase; margin-left: 16px;">
+            {% if challenge.challenge_type == 'yearly' %}
+              <span style="background: linear-gradient(135deg, #10b981, #059669); color: white;">📅 Năm</span>
+            {% elif challenge.challenge_type == 'monthly' %}
+              <span style="background: linear-gradient(135deg, #3b82f6, #2563eb); color: white;">📆 Tháng</span>
+            {% elif challenge.challenge_type == 'weekly' %}
+              <span style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white;">📅 Tuần</span>
+            {% else %}
+              <span style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white;">🎯 Tùy chỉnh</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Progress Section -->
+        <div class="progress-section" style="margin-bottom: 20px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <span style="font-weight: 600; color: var(--text);">Tiến độ đọc review</span>
+            <span style="font-size: 14px; color: var(--text-secondary);">
+              {{ challenge.current_count }}/{{ challenge.target_count }} review
+            </span>
+          </div>
+          
+          <div style="width: 100%; height: 12px; background: var(--border); border-radius: 6px; overflow: hidden; margin-bottom: 8px;">
+            {% set progress_percent = (challenge.current_count / challenge.target_count * 100) if challenge.target_count > 0 else 0 %}
+            <div style="width: {{ progress_percent }}%; height: 100%; background: linear-gradient(90deg, var(--primary), var(--accent)); transition: width 0.3s; position: relative;">
+              {% if progress_percent > 0 %}
+              <div style="position: absolute; right: 4px; top: 50%; transform: translateY(-50%); font-size: 10px; color: white; font-weight: 600;">
+                {{ progress_percent|round(0) }}%
+              </div>
+              {% endif %}
+            </div>
+          </div>
+          
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 12px; color: var(--text-secondary);">
+              {% if challenge.is_completed %}
+                🎉 Chúc mừng! Bạn đã hoàn thành thử thách!
+              {% else %}
+                Còn {{ challenge.target_count - challenge.current_count }} review nữa để hoàn thành
+              {% endif %}
+            </span>
+            <span style="font-size: 12px; color: var(--text-secondary);">
+              Tham gia: {{ challenge.joined_at[:10] }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Challenge Info -->
+        <div class="challenge-info" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 16px; margin-bottom: 20px;">
+          <div style="text-align: center; padding: 12px; background: var(--bg); border-radius: 8px;">
+            <div style="font-size: 18px; font-weight: 700; color: var(--primary);">{{ challenge.target_count }}</div>
+            <div style="font-size: 11px; color: var(--text-secondary);">Mục tiêu</div>
+          </div>
+          <div style="text-align: center; padding: 12px; background: var(--bg); border-radius: 8px;">
+            <div style="font-size: 18px; font-weight: 700; color: var(--accent);">{{ challenge.current_count }}</div>
+            <div style="font-size: 11px; color: var(--text-secondary);">Đã đọc review</div>
+          </div>
+          <div style="text-align: center; padding: 12px; background: var(--bg); border-radius: 8px;">
+            <div style="font-size: 18px; font-weight: 700; color: #10b981;">{{ challenge.end_date[:10] }}</div>
+            <div style="font-size: 11px; color: var(--text-secondary);">Kết thúc</div>
+          </div>
+          <div style="text-align: center; padding: 12px; background: var(--bg); border-radius: 8px;">
+            <div style="font-size: 18px; font-weight: 700; color: #f59e0b;">{{ progress_percent|round(1) }}%</div>
+            <div style="font-size: 11px; color: var(--text-secondary);">Hoàn thành</div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="challenge-actions" style="display: flex; gap: 12px; justify-content: flex-end;">
+          <a href="{{ url_for('my_shelves') }}" class="btn secondary" style="padding: 8px 16px; font-size: 13px; text-decoration: none;">
+            📚 Xem kệ sách
+          </a>
+          <a href="{{ url_for('books_list') }}" class="btn" style="padding: 8px 16px; font-size: 13px; text-decoration: none;">
+            🔍 Tìm sách
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state" style="text-align: center; padding: 60px 20px; color: var(--muted);">
+      <div style="font-size: 64px; margin-bottom: 20px;">🏆</div>
+      <h3 style="margin: 0 0 12px 0; color: var(--text);">Chưa tham gia thử thách nào</h3>
+      <p style="margin: 0 0 20px 0;">Bạn chưa tham gia thử thách đọc sách nào.</p>
+      <p style="margin: 0 0 20px 0; color: var(--text-secondary);">
+        Hãy tham gia các thử thách để tăng động lực đọc sách và kết nối với cộng đồng!
+      </p>
+      <a href="{{ url_for('challenges_list') }}" class="btn" style="margin-right: 12px;">Xem thử thách</a>
+      <a href="{{ url_for('books_list') }}" class="btn secondary">Khám phá sách</a>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Overall Progress -->
+  {% if challenges %}
+  <div class="overall-progress" style="margin-top: 40px; padding: 24px; background: var(--panel); border: 1px solid var(--border); border-radius: 12px;">
+    <h3 style="margin: 0 0 20px 0; color: var(--text); text-align: center;">📊 Tổng quan tiến độ</h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+      <div style="text-align: center; padding: 16px; background: var(--bg); border-radius: 8px;">
+        <div style="font-size: 24px; font-weight: 700; color: var(--primary); margin-bottom: 4px;">
+          {{ challenges|length }}
+        </div>
+        <div style="font-size: 12px; color: var(--text-secondary);">Thử thách đang tham gia</div>
+      </div>
+      <div style="text-align: center; padding: 16px; background: var(--bg); border-radius: 8px;">
+        <div style="font-size: 24px; font-weight: 700; color: var(--accent); margin-bottom: 4px;">
+          {{ challenges|sum(attribute='current_count') }}
+        </div>
+        <div style="font-size: 12px; color: var(--text-secondary);">Tổng review đã đọc</div>
+      </div>
+      <div style="text-align: center; padding: 16px; background: var(--bg); border-radius: 8px;">
+        <div style="font-size: 24px; font-weight: 700; color: #10b981; margin-bottom: 4px;">
+          {{ challenges|selectattr('is_completed')|list|length }}
+        </div>
+        <div style="font-size: 12px; color: var(--text-secondary);">Thử thách hoàn thành</div>
+      </div>
+      <div style="text-align: center; padding: 16px; background: var(--bg); border-radius: 8px;">
+        <div style="font-size: 24px; font-weight: 700; color: #f59e0b; margin-bottom: 4px;">
+          {{ ((challenges|sum(attribute='current_count') / challenges|sum(attribute='target_count')) * 100)|round(1) if challenges|sum(attribute='target_count') > 0 else 0 }}%
+        </div>
+        <div style="font-size: 12px; color: var(--text-secondary);">Tỷ lệ hoàn thành TB</div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<style>
+.challenge-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+@media (max-width: 768px) {
+  .challenge-header {
+    flex-direction: column !important;
+    gap: 12px;
+  }
+  
+  .challenge-type {
+    margin-left: 0 !important;
+    align-self: flex-start;
+  }
+  
+  .challenge-actions {
+    flex-direction: column !important;
+  }
+}
+</style>
+{% endblock %}

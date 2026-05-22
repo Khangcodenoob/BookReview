@@ -1,0 +1,65 @@
+<!-- Nút Floating bên trái -->
+<button class="donate-fab" id="donate-fab" title="Ủng hộ dự án">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+  </svg>
+</button>
+
+<!-- Overlay nền mờ -->
+<div class="donate-modal-overlay" id="donate-overlay">
+  <!-- Modal nội dung ủng hộ -->
+  <div class="donate-modal" id="donate-modal">
+    <button class="donate-close" id="donate-close" aria-label="Đóng">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+
+    <div class="donate-header">
+      <h3>❤️ Ủng hộ dự án</h3>
+      <p>Nếu bạn thấy website hữu ích, hãy ủng hộ để duy trì và phát triển.</p>
+    </div>
+
+    <div class="donate-body">
+      <!-- QR Code -->
+      <div class="donate-qr-wrapper">
+        <img src="{{ url_for('static', filename='uploads/QR.jpg') }}" alt="QR Code Ủng hộ" class="donate-qr-img" id="donate-qr-img" title="Nhấp để phóng to">
+      </div>
+
+      <!-- Bank Details -->
+      <div class="donate-bank-info">
+        <div class="info-row">
+          <span class="info-label">Ngân hàng:</span>
+          <span class="info-value"><strong>TechComBank</strong></span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Chủ tài khoản:</span>
+          <span class="info-value"><strong>Dương Chí Khang</strong></span>
+        </div>
+        <div class="info-row account-row">
+          <div class="account-details">
+            <span class="info-label">Số tài khoản:</span>
+            <span class="info-value account-number" id="donate-account">6969 9999 3979</span>
+          </div>
+          <button class="btn btn-primary copy-btn" id="donate-copy-btn" title="Sao chép số tài khoản">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            Copy
+          </button>
+        </div>
+        <div class="info-row note-row">
+          <span class="info-label">Nội dung chuyển khoản:</span>
+          <span class="info-value note-text">Ủng hộ Chạm Sách</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal phóng to QR -->
+<div class="donate-zoom-overlay" id="donate-zoom-overlay">
+  <img src="{{ url_for('static', filename='uploads/QR.jpg') }}" class="donate-zoom-img" alt="QR Code Zoom">
+</div>

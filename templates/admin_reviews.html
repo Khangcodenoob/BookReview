@@ -43,9 +43,11 @@
       <td style="text-align:right;display:flex;gap:8px;justify-content:flex-end">
         <a class="btn secondary" href="{{ url_for('admin_review_edit', review_id=r.id) }}">Sửa chi tiết</a>
         <form method="post" action="{{ url_for('admin_review_approve', review_id=r.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           <button class="btn" type="submit">Duyệt</button>
         </form>
         <form method="post" action="{{ url_for('admin_review_reject', review_id=r.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           <input name="reason" placeholder="Lý do từ chối" style="background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:8px">
           <button class="btn secondary" type="submit">Từ chối</button>
         </form>

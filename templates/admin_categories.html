@@ -4,6 +4,7 @@
 <div class="admin-header">
   <h2>Danh mục</h2>
   <form method="post" action="{{ url_for('admin_categories_new') }}" class="form" style="grid-template-columns:1fr auto;align-items:end;max-width:420px">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
     <label>Tên danh mục
       <input name="name" required placeholder="VD: Tiểu thuyết">
     </label>
@@ -24,12 +25,14 @@
       <td>{{ c.name }}</td>
       <td style="text-align:right">
         <form method="post" action="{{ url_for('admin_categories_delete', cat_id=c.id) }}" onsubmit="return confirm('Xoá danh mục này? Sách sẽ bị bỏ gắn danh mục.')">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
           <button class="btn secondary" type="submit">Xoá</button>
         </form>
       </td>
     </tr>
     {% endfor %}
   </tbody>
+</table>
 {% endblock %}
 
 

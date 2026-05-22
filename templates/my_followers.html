@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block title %}Followers{% endblock %}
+{% block content %}
+<div class="followers-page">
+  <div class="page-header" style="text-align: center; margin-bottom: 40px;">
+    <h1>👥 Followers</h1>
+    <p class="muted">Danh sách những người đang follow bạn</p>
+  </div>
+
+  <div class="followers-container" style="max-width: 800px; margin: 0 auto;">
+    {% if followers %}
+    <div class="users-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+      {% for user in followers %}
+      <div class="user-card" style="background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px; transition: all 0.2s;">
+        <div class="user-header" style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+          <div class="user-avatar" style="width: 50px; height: 50px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; color: #06210e; font-size: 20px; font-weight: 600;">
+            {{ user.username[0].upper() }}
+          </div>
+          <div class="user-info" style="flex: 1;">
+            <h3 style="margin: 0 0 4px 0; font-size: 18px; font-weight: 600;">
+              <a href="{{ url_for('user_profile', user_id=user.id) }}" style="color: var(--text); text-decoration: none;">{{ user.username }}</a>
+            </h3>
+            <p style="margin: 0; color: var(--text-secondary); font-size: 12px;">
+              Thành viên từ {{ user.created_at[:10] }}
+            </p>
+          </div>
+        </div>
+        
+        <div class="user-actions" style="display: flex; justify-content: space-between; align-items: center;">
+          <div class="follow-info" style="color: var(--text-secondary); font-size: 12px;">
+            Đã follow từ {{ user.followed_at[:10] }}
+          </div>
+          <div class="action-buttons" style="display: flex; gap: 8px;">
+            <a href="{{ url_for('user_profile', user_id=user.id) }}" class="btn secondary" style="padding: 6px 12px; font-size: 12px;">
+              Xem hồ sơ
+            </a>
+            {% if user.id != current_user.id %}
+            <form method="post" action="{{ url_for('follow_user', user_id=user.id) }}" style="display: inline;">
+              <button type="submit" class="btn" style="padding: 6px 12px; font-size: 12px;">
+                Follow back
+              </button>
+            </form>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state" style="text-align: center; padding: 60px 20px; color: var(--muted);">
+      <div style="font-size: 64px; margin-bottom: 20px;">👥</div>
+      <h3 style="margin: 0 0 12px 0; color: var(--text);">Chưa có followers</h3>
+      <p style="margin: 0 0 20px 0;">Chưa có ai follow bạn cả.</p>
+      <p style="margin: 0 0 20px 0; color: var(--text-secondary);">
+        Hãy tích cực đọc sách, viết review và tương tác với cộng đồng để thu hút followers!
+      </p>
+      <a href="{{ url_for('books_list') }}" class="btn" style="margin-right: 12px;">Khám phá sách</a>
+      <a href="{{ url_for('my_shelves') }}" class="btn secondary">Quản lý kệ sách</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<style>
+.user-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+@media (max-width: 768px) {
+  .users-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+</style>
+{% endblock %}

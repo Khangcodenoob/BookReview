@@ -1,0 +1,7 @@
+{# CSRF Token Macro - Use this in all POST forms #}
+{% macro csrf_input() %}
+{% if csrf_token %}
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+{% endif %}
+{% endmacro %}
+

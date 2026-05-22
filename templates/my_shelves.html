@@ -1,0 +1,310 @@
+{% extends 'base.html' %}
+{% block title %}Kệ sách của tôi{% endblock %}
+{% block content %}
+<div class="shelves-page">
+  <div class="page-header">
+    <h1>📚 Kệ sách của tôi</h1>
+    <p class="muted">Quản lý sách đã đọc, đang đọc và muốn đọc</p>
+  </div>
+
+  <div class="shelves-grid">
+    <!-- Want to Read Shelf -->
+    <div class="shelf-section">
+      <div class="shelf-header">
+        <h2>📋 Muốn đọc ({{ want_to_read_books|length }})</h2>
+        <p class="muted">Sách bạn muốn đọc trong tương lai</p>
+      </div>
+      {% if want_to_read_books %}
+      <div class="books-grid">
+        {% for book in want_to_read_books %}
+        <div class="book-card">
+          <a href="{{ url_for('book_detail', book_id=book.id) }}">
+            <img src="{{ book.cover_url or url_for('static', filename='placeholder.jpg') }}" 
+                 alt="{{ book.title }}" class="book-cover">
+          </a>
+          <div class="book-info">
+            <h3><a href="{{ url_for('book_detail', book_id=book.id) }}">{{ book.title }}</a></h3>
+            <p class="author">{{ book.author }}</p>
+            <p class="added-date muted">Thêm vào: {{ book.added_at[:10] }}</p>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-shelf">
+        <p>Chưa có sách nào trong kệ này.</p>
+        <p><a href="{{ url_for('books_list') }}" class="btn">Khám phá sách</a></p>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Currently Reading Shelf -->
+    <div class="shelf-section">
+      <div class="shelf-header">
+        <h2>📚 Đang đọc ({{ reading_books|length }})</h2>
+        <p class="muted">Sách bạn đang đọc hiện tại</p>
+      </div>
+      {% if reading_books %}
+      <div class="books-grid">
+        {% for book in reading_books %}
+        <div class="book-card">
+          <a href="{{ url_for('book_detail', book_id=book.id) }}">
+            <img src="{{ book.cover_url or url_for('static', filename='placeholder.jpg') }}" 
+                 alt="{{ book.title }}" class="book-cover">
+          </a>
+          <div class="book-info">
+            <h3><a href="{{ url_for('book_detail', book_id=book.id) }}">{{ book.title }}</a></h3>
+            <p class="author">{{ book.author }}</p>
+            <p class="added-date muted">Bắt đầu đọc: {{ book.added_at[:10] }}</p>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-shelf">
+        <p>Chưa có sách nào trong kệ này.</p>
+        <p><a href="{{ url_for('books_list') }}" class="btn">Khám phá sách</a></p>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Read Shelf -->
+    <div class="shelf-section">
+      <div class="shelf-header">
+        <h2>📖 Đã đọc ({{ read_books|length }})</h2>
+        <p class="muted">Sách bạn đã hoàn thành</p>
+      </div>
+      {% if read_books %}
+      <div class="books-grid">
+        {% for book in read_books %}
+        <div class="book-card">
+          <a href="{{ url_for('book_detail', book_id=book.id) }}">
+            <img src="{{ book.cover_url or url_for('static', filename='placeholder.jpg') }}" 
+                 alt="{{ book.title }}" class="book-cover">
+          </a>
+          <div class="book-info">
+            <h3><a href="{{ url_for('book_detail', book_id=book.id) }}">{{ book.title }}</a></h3>
+            <p class="author">{{ book.author }}</p>
+            <p class="added-date muted">Hoàn thành: {{ book.added_at[:10] }}</p>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-shelf">
+        <p>Chưa có sách nào trong kệ này.</p>
+        <p><a href="{{ url_for('books_list') }}" class="btn">Khám phá sách</a></p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Statistics -->
+  <div class="shelf-stats">
+    <h3>📊 Thống kê đọc sách</h3>
+    <div class="stats-grid">
+      <div class="stat-item">
+        <div class="stat-number">{{ read_books|length }}</div>
+        <div class="stat-label">Đã đọc</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">{{ reading_books|length }}</div>
+        <div class="stat-label">Đang đọc</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">{{ want_to_read_books|length }}</div>
+        <div class="stat-label">Muốn đọc</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">{{ read_books|length + reading_books|length + want_to_read_books|length }}</div>
+        <div class="stat-label">Tổng cộng</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.shelves-page {
+  max-width: min(90vw, 1200px);
+  margin: 0 auto;
+  padding: 16px 20px;
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.shelves-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+.shelf-section {
+  background: var(--panel);
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  padding: 20px 20px 24px;
+  box-shadow: var(--shadow-md);
+}
+
+.shelf-header {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.shelf-header h2 {
+  margin: 0 0 8px 0;
+  color: var(--text-primary);
+}
+
+.books-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+@media (min-width: 768px) {
+  .books-grid {
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  }
+}
+
+@media (min-width: 1200px) {
+  .books-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+}
+
+.book-card {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: 10px;
+  padding: 12px;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+  box-shadow: var(--shadow-sm);
+  color: var(--text-primary);
+}
+
+.book-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary);
+}
+
+.book-card .book-cover {
+  width: 100%;
+  aspect-ratio: 3/4;
+  height: auto;
+  object-fit: cover;
+  border-radius: 8px;
+  margin: 0 auto 12px;
+}
+
+@media (max-width: 768px) {
+  .book-card .book-cover {
+    width: 75%;
+  }
+}
+
+.book-card .book-info h3 {
+  margin: 0 0 6px 0;
+  font-size: 14px;
+  line-height: 1.3;
+}
+
+.book-card .book-info h3 a {
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.book-card .book-info h3 a:hover {
+  color: var(--accent);
+}
+
+.book-card a:visited {
+  color: var(--text-primary);
+}
+
+.book-card .author {
+  margin: 0 0 6px 0;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.book-card .added-date {
+  margin: 0;
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
+/* Improve contrast in dark theme explicitly */
+[data-theme="dark"] .book-card {
+  background: var(--panel);
+  border-color: var(--border);
+}
+
+[data-theme="dark"] .book-card .book-info h3 a,
+[data-theme="dark"] .book-card a:visited {
+  color: var(--text-primary);
+}
+
+.empty-shelf {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-secondary);
+}
+
+.shelf-stats {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+}
+
+.shelf-stats h3 {
+  margin: 0 0 20px 0;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 20px;
+}
+
+.stat-item {
+  padding: 16px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.stat-number {
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--primary);
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+@media (max-width: 768px) {
+  .books-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 16px;
+  }
+  
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+</style>
+{% endblock %}

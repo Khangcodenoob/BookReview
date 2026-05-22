@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Chính sách bảo mật - Chạm Sách{% endblock %}
+
+{% block content %}
+<div class="support-container">
+  <div class="support-header">
+    <h1>Chính sách bảo mật</h1>
+    <p>Cập nhật lần cuối: Tháng 4, 2026</p>
+  </div>
+
+  <div class="doc-card">
+    <div class="doc-section">
+      <h2>1. Dữ liệu người dùng được lưu trữ những gì?</h2>
+      <div class="doc-content">
+        <p>Khi bạn đăng ký và sử dụng Chạm Sách, chúng tôi thu thập một số thông tin cơ bản để cung cấp dịch vụ tốt nhất cho bạn, bao gồm:</p>
+        <ul>
+          <li><strong>Thông tin tài khoản:</strong> Tên hiển thị, địa chỉ email, ảnh đại diện (avatar).</li>
+          <li><strong>Mật khẩu:</strong> Tất cả mật khẩu của bạn đều được mã hóa một chiều (hashing) trước khi lưu vào cơ sở dữ liệu. Không ai, kể cả quản trị viên, có thể biết mật khẩu gốc của bạn.</li>
+          <li><strong>Dữ liệu hoạt động:</strong> Lịch sử đánh giá (review), các sách được lưu (bookmark) và các hoạt động tương tác công khai trên nền tảng.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="doc-section">
+      <h2>2. Dữ liệu được sử dụng như thế nào?</h2>
+      <div class="doc-content">
+        <p>Dữ liệu của bạn chỉ được sử dụng trong phạm vi nền tảng Chạm Sách cho các mục đích:</p>
+        <ul>
+          <li><strong>Email:</strong> Dùng để xác thực tài khoản, khôi phục mật khẩu, và gửi thông báo quan trọng về tài khoản của bạn.</li>
+          <li><strong>Avatar và Tên hiển thị:</strong> Hiển thị công khai cạnh các bài đánh giá (review) của bạn để cộng đồng nhận diện.</li>
+          <li><strong>Bookmark:</strong> Lưu trữ dữ liệu trên máy chủ để đồng bộ hóa sách yêu thích của bạn trên mọi thiết bị.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="doc-section">
+      <h2>3. Chia sẻ dữ liệu với bên thứ ba</h2>
+      <div class="doc-content">
+        <p><strong>Chúng tôi cam kết không bán, trao đổi, hay chia sẻ thông tin cá nhân của bạn cho bất kỳ bên thứ ba nào</strong> vì mục đích thương mại.</p>
+        <p>Ngoại lệ duy nhất là khi có yêu cầu hợp pháp từ cơ quan thực thi pháp luật có thẩm quyền nhằm mục đích phục vụ điều tra.</p>
+      </div>
+    </div>
+
+    <div class="doc-section">
+      <h2>4. Yêu cầu xóa dữ liệu</h2>
+      <div class="doc-content">
+        <p>Bất cứ lúc nào bạn cũng có quyền yêu cầu xóa bỏ hoàn toàn tài khoản và dữ liệu cá nhân của mình khỏi hệ thống Chạm Sách.</p>
+        <p>Để thực hiện điều này, vui lòng truy cập trang <a href="{{ url_for('contact_admin') }}">Liên hệ quản trị viên</a> và gửi yêu cầu xóa tài khoản bằng email đã đăng ký. Chúng tôi sẽ xử lý yêu cầu của bạn trong vòng 3-5 ngày làm việc.</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

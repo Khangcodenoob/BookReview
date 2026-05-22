@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %}Quản lý đơn hàng{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">Quản lý đơn hàng</h1>
+  <p class="page-subtitle">Xem và cập nhật trạng thái đơn hàng</p>
+</div>
+
+{% if orders %}
+<div class="admin-orders-list" style="max-width: 1000px; margin: 0 auto;">
+  <table style="width: 100%; border-collapse: collapse; background: var(--panel); border-radius: 16px; overflow: hidden; border: 1px solid var(--border);">
+    <thead>
+      <tr style="background: var(--bg);">
+        <th style="text-align: left; padding: 16px; color: var(--muted); font-weight: 600;">ID</th>
+        <th style="text-align: left; padding: 16px; color: var(--muted); font-weight: 600;">Ngày</th>
+        <th style="text-align: left; padding: 16px; color: var(--muted); font-weight: 600;">User</th>
+        <th style="text-align: left; padding: 16px; color: var(--muted); font-weight: 600;">Trạng thái</th>
+        <th style="text-align: right; padding: 16px; color: var(--muted); font-weight: 600;">Tổng</th>
+        <th style="text-align: center; padding: 16px; color: var(--muted); font-weight: 600;">Thao tác</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for order in orders %}
+      <tr style="border-top: 1px solid var(--border);">
+        <td style="padding: 16px;"><a href="{{ url_for('admin_order_detail', order_id=order.id) }}" style="color: var(--primary); text-decoration: none;">#{{ order.id }}</a></td>
+        <td style="padding: 16px; color: var(--muted);">{{ order.created_at.strftime('%d/%m/%Y %H:%M') if order.created_at else '' }}</td>
+        <td style="padding: 16px;">{{ order.user.username if order.user else order.user_id }}</td>
+        <td style="padding: 16px;">
+          <span style="padding: 4px 10px; border-radius: 8px; font-size: 12px; font-weight: 600;
+            {% if order.status == 'pending' %}background: #fef3c7; color: #92400e;
+            {% elif order.status == 'paid' %}background: #dbeafe; color: #1e40af;
+            {% elif order.status == 'shipped' %}background: #d1fae5; color: #065f46;
+            {% elif order.status == 'canceled' %}background: #fee2e2; color: #991b1b;
+            {% else %}background: var(--border); color: var(--text);{% endif %}">
+            {{ order.status }}
+          </span>
+        </td>
+        <td style="padding: 16px; text-align: right; font-weight: 600;">{{ "{:,.0f}".format(order.total) }} VND</td>
+        <td style="padding: 16px; text-align: center;">
+          <a href="{{ url_for('admin_order_detail', order_id=order.id) }}" class="btn secondary" style="padding: 6px 12px; font-size: 13px; text-decoration: none;">Chi tiết</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="empty-state" style="text-align: center; padding: 60px 20px;">
+  <h3>Chưa có đơn hàng</h3>
+</div>
+{% endif %}
+{% endblock %}

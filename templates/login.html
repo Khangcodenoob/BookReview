@@ -5,9 +5,10 @@
   <div class="auth-card">
     <div class="auth-header">
       <h2>Đăng nhập</h2>
-      <p>Chào mừng quay lại Hybi Books</p>
+      <p>Chào mừng quay lại Chạm Sách</p>
     </div>
     <form method="post" class="form auth-form" novalidate>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
       <div class="form-group">
         <label for="login-username">Tên đăng nhập</label>
         <input id="login-username" name="username" autocomplete="username" required>

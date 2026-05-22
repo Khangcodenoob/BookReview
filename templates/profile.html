@@ -40,20 +40,32 @@
             📚 Thành viên
           </span>
         </div>
-        <div class="user-stats" style="display: flex; gap: 24px; margin-top: 16px;">
-          <div class="stat-item" style="text-align: center;">
-            <div class="stat-number" style="font-size: 24px; font-weight: 700; margin-bottom: 4px;">{{ bookmarks|length }}</div>
-            <div class="stat-label" style="font-size: 12px; opacity: 0.8;">Sách đã lưu</div>
+          <div class="user-stats" style="display: flex; gap: 24px; margin-top: 16px;">
+            <div class="stat-item" style="text-align: center;">
+              <div class="stat-number" style="font-size: 24px; font-weight: 700; margin-bottom: 4px;">{{ bookmarks|length }}</div>
+              <div class="stat-label" style="font-size: 12px; opacity: 0.8;">Sách đã lưu</div>
+            </div>
+            <div class="stat-item" style="text-align: center;">
+              <div class="stat-number" style="font-size: 24px; font-weight: 700; margin-bottom: 4px;">{{ my_reviews|length }}</div>
+              <div class="stat-label" style="font-size: 12px; opacity: 0.8;">Đánh giá</div>
+            </div>
+            <div class="stat-item" style="text-align: center;">
+              <div class="stat-number" style="font-size: 24px; font-weight: 700; margin-bottom: 4px;">{{ (my_reviews|sum(attribute='rating') / my_reviews|length if my_reviews else 0)|round(1) }}</div>
+              <div class="stat-label" style="font-size: 12px; opacity: 0.8;">Điểm TB</div>
+            </div>
           </div>
-          <div class="stat-item" style="text-align: center;">
-            <div class="stat-number" style="font-size: 24px; font-weight: 700; margin-bottom: 4px;">{{ my_reviews|length }}</div>
-            <div class="stat-label" style="font-size: 12px; opacity: 0.8;">Đánh giá</div>
+          
+          <!-- Social Stats -->
+          <div class="social-stats" style="display: flex; gap: 16px; margin-top: 16px; justify-content: center;">
+            <a href="{{ url_for('my_followers') }}" class="social-stat" style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: rgba(255,255,255,0.1); border-radius: 20px; text-decoration: none; color: #06210e; transition: all 0.2s;">
+              <span style="font-size: 16px;">👥</span>
+              <span style="font-weight: 600; font-size: 14px;">Followers</span>
+            </a>
+            <a href="{{ url_for('my_following') }}" class="social-stat" style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: rgba(255,255,255,0.1); border-radius: 20px; text-decoration: none; color: #06210e; transition: all 0.2s;">
+              <span style="font-size: 16px;">➕</span>
+              <span style="font-weight: 600; font-size: 14px;">Following</span>
+            </a>
           </div>
-          <div class="stat-item" style="text-align: center;">
-            <div class="stat-number" style="font-size: 24px; font-weight: 700; margin-bottom: 4px;">{{ (my_reviews|sum(attribute='rating') / my_reviews|length if my_reviews else 0)|round(1) }}</div>
-            <div class="stat-label" style="font-size: 12px; opacity: 0.8;">Điểm TB</div>
-          </div>
-        </div>
       </div>
     </div>
   </div>
@@ -61,6 +73,7 @@
 
 <!-- Hidden Avatar Upload Form -->
 <form id="avatar-form" method="post" action="{{ url_for('upload_avatar') }}" enctype="multipart/form-data" style="display: none;">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
   <input id="avatar-upload" type="file" name="avatar" accept="image/*" onchange="uploadAvatar()">
     </form>
 
@@ -70,8 +83,14 @@
     <button class="nav-tab active" data-tab="bookmarks" style="flex: 1; padding: 12px 16px; border: none; background: var(--primary); color: #06210e; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s;">
       📚 Sách đã lưu
     </button>
+    <button class="nav-tab" data-tab="shelves" style="flex: 1; padding: 12px 16px; border: none; background: transparent; color: var(--text); border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+      📖 Kệ sách
+    </button>
     <button class="nav-tab" data-tab="reviews" style="flex: 1; padding: 12px 16px; border: none; background: transparent; color: var(--text); border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s;">
       ⭐ Đánh giá
+    </button>
+    <button class="nav-tab" data-tab="challenges" style="flex: 1; padding: 12px 16px; border: none; background: transparent; color: var(--text); border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+      🏆 Thử thách
     </button>
     <button class="nav-tab" data-tab="activity" style="flex: 1; padding: 12px 16px; border: none; background: transparent; color: var(--text); border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s;">
       📊 Hoạt động
@@ -128,6 +147,51 @@
     </div>
   </div>
 
+  <!-- Shelves Tab -->
+  <div id="shelves-tab" class="tab-panel" style="display: none;">
+    <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <h2 style="margin: 0; color: var(--text);">📖 Kệ sách của tôi</h2>
+      <a href="{{ url_for('my_shelves') }}" class="btn" style="padding: 8px 16px; font-size: 14px;">
+        Xem chi tiết
+      </a>
+    </div>
+    
+    <div class="shelves-preview">
+      <div class="shelf-cards" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+        <div class="shelf-card" style="background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px; text-align: center;">
+          <div style="font-size: 32px; margin-bottom: 12px;">📋</div>
+          <h3 style="margin: 0 0 8px 0; color: var(--text);">Muốn đọc</h3>
+          <p style="margin: 0; color: var(--muted); font-size: 14px;">Sách bạn muốn đọc trong tương lai</p>
+          <div style="font-size: 24px; font-weight: 700; color: var(--primary); margin: 12px 0;">{{ want_to_read_count }}</div>
+          <a href="{{ url_for('my_shelves') }}" class="btn secondary" style="padding: 6px 12px; font-size: 12px;">Xem tất cả</a>
+        </div>
+        
+        <div class="shelf-card" style="background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px; text-align: center;">
+          <div style="font-size: 32px; margin-bottom: 12px;">📚</div>
+          <h3 style="margin: 0 0 8px 0; color: var(--text);">Đang đọc</h3>
+          <p style="margin: 0; color: var(--muted); font-size: 14px;">Sách bạn đang đọc hiện tại</p>
+          <div style="font-size: 24px; font-weight: 700; color: var(--accent); margin: 12px 0;">{{ reading_count }}</div>
+          <a href="{{ url_for('my_shelves') }}" class="btn secondary" style="padding: 6px 12px; font-size: 12px;">Xem tất cả</a>
+        </div>
+        
+        <div class="shelf-card" style="background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px; text-align: center;">
+          <div style="font-size: 32px; margin-bottom: 12px;">📖</div>
+          <h3 style="margin: 0 0 8px 0; color: var(--text);">Đã đọc</h3>
+          <p style="margin: 0; color: var(--muted); font-size: 14px;">Sách bạn đã hoàn thành</p>
+          <div style="font-size: 24px; font-weight: 700; color: #10b981; margin: 12px 0;">{{ read_count }}</div>
+          <a href="{{ url_for('my_shelves') }}" class="btn secondary" style="padding: 6px 12px; font-size: 12px;">Xem tất cả</a>
+        </div>
+      </div>
+      
+      <div class="shelves-cta" style="text-align: center; margin-top: 30px; padding: 30px; background: var(--panel); border: 1px solid var(--border); border-radius: 12px;">
+        <h3 style="margin: 0 0 12px 0; color: var(--text);">Bắt đầu xây dựng kệ sách của bạn</h3>
+        <p style="margin: 0 0 20px 0; color: var(--muted);">Thêm sách vào các kệ để theo dõi tiến độ đọc và chia sẻ với cộng đồng</p>
+        <a href="{{ url_for('books_list') }}" class="btn" style="margin-right: 12px;">Khám phá sách</a>
+        <a href="{{ url_for('my_shelves') }}" class="btn secondary">Quản lý kệ sách</a>
+      </div>
+    </div>
+  </div>
+
   <!-- Reviews Tab -->
   <div id="reviews-tab" class="tab-panel" style="display: none;">
     <div class="section-header" style="margin-bottom: 20px;">
@@ -171,6 +235,51 @@
         <a href="{{ url_for('books_list') }}" class="btn" style="margin-top: 16px; display: inline-block;">Khám phá sách</a>
       </div>
     {% endfor %}
+    </div>
+  </div>
+
+  <!-- Challenges Tab -->
+  <div id="challenges-tab" class="tab-panel" style="display: none;">
+    <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <h2 style="margin: 0; color: var(--text);">🏆 Thử thách đọc review</h2>
+      <a href="{{ url_for('challenges_list') }}" class="btn" style="padding: 8px 16px; font-size: 14px;">
+        Xem tất cả
+      </a>
+    </div>
+    
+    <div class="challenges-preview">
+      <div class="challenge-cards" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+        <div class="challenge-card" style="background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px; text-align: center;">
+          <div style="font-size: 32px; margin-bottom: 12px;">🏆</div>
+          <h3 style="margin: 0 0 8px 0; color: var(--text);">Thử thách năm 2024</h3>
+          <p style="margin: 0; color: var(--muted); font-size: 14px;">Đọc review của 12 cuốn sách</p>
+          <div style="font-size: 24px; font-weight: 700; color: var(--primary); margin: 12px 0;">0/12</div>
+          <a href="{{ url_for('challenges_list') }}" class="btn secondary" style="padding: 6px 12px; font-size: 12px;">Tham gia</a>
+        </div>
+        
+        <div class="challenge-card" style="background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px; text-align: center;">
+          <div style="font-size: 32px; margin-bottom: 12px;">📅</div>
+          <h3 style="margin: 0 0 8px 0; color: var(--text);">Thử thách tháng</h3>
+          <p style="margin: 0; color: var(--muted); font-size: 14px;">Đọc review của 2 cuốn sách</p>
+          <div style="font-size: 24px; font-weight: 700; color: var(--accent); margin: 12px 0;">0/2</div>
+          <a href="{{ url_for('challenges_list') }}" class="btn secondary" style="padding: 6px 12px; font-size: 12px;">Tham gia</a>
+        </div>
+        
+        <div class="challenge-card" style="background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px; text-align: center;">
+          <div style="font-size: 32px; margin-bottom: 12px;">📚</div>
+          <h3 style="margin: 0 0 8px 0; color: var(--text);">Thử thách tuần</h3>
+          <p style="margin: 0; color: var(--muted); font-size: 14px;">Đọc review của 1 cuốn sách</p>
+          <div style="font-size: 24px; font-weight: 700; color: #10b981; margin: 12px 0;">0/1</div>
+          <a href="{{ url_for('challenges_list') }}" class="btn secondary" style="padding: 6px 12px; font-size: 12px;">Tham gia</a>
+        </div>
+      </div>
+      
+      <div class="challenges-cta" style="text-align: center; margin-top: 30px; padding: 30px; background: var(--panel); border: 1px solid var(--border); border-radius: 12px;">
+        <h3 style="margin: 0 0 12px 0; color: var(--text);">Tham gia thử thách đọc review</h3>
+        <p style="margin: 0 0 20px 0; color: var(--muted);">Khám phá nhiều review sách hay và kết nối với cộng đồng</p>
+        <a href="{{ url_for('challenges_list') }}" class="btn" style="margin-right: 12px;">Xem thử thách</a>
+        <a href="{{ url_for('my_challenges') }}" class="btn secondary">Thử thách của tôi</a>
+      </div>
     </div>
   </div>
 
@@ -352,6 +461,13 @@ function deleteAvatar() {
     const form = document.createElement('form');
     form.method = 'POST';
     form.action = '{{ url_for("delete_avatar") }}';
+
+    const csrfInput = document.createElement('input');
+    csrfInput.type = 'hidden';
+    csrfInput.name = 'csrf_token';
+    csrfInput.value = '{{ csrf_token() }}';
+    form.appendChild(csrfInput);
+
     document.body.appendChild(form);
     form.submit();
   }
@@ -361,20 +477,17 @@ function deleteAvatar() {
 function removeBookmark(bookId) {
   if (confirm('Bạn có chắc muốn bỏ lưu sách này?')) {
     // Implement bookmark removal
-    console.log('Remove bookmark:', bookId);
   }
 }
 
 // Review functions
 function editReview(reviewId) {
   // Implement review editing
-  console.log('Edit review:', reviewId);
 }
 
 function deleteReview(reviewId) {
   if (confirm('Bạn có chắc muốn xóa đánh giá này?')) {
     // Implement review deletion
-    console.log('Delete review:', reviewId);
   }
 }
 </script>

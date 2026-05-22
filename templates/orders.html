@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}Đơn hàng của tôi{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">Đơn hàng của tôi</h1>
+  <p class="page-subtitle">Xem lịch sử và chi tiết đơn hàng</p>
+</div>
+
+{% if orders %}
+<div class="orders-list" style="max-width: 800px; margin: 0 auto;">
+  {% for order in orders %}
+  <a href="{{ url_for('order_detail', order_id=order.id) }}" class="order-card" style="display: block; background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 16px; text-decoration: none; color: inherit; transition: all 0.2s;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px;">
+      <div>
+        <span style="font-weight: 600; font-size: 14px; color: var(--muted);">#{{ order.id }}</span>
+        <span style="margin-left: 12px; padding: 4px 10px; border-radius: 8px; font-size: 12px; font-weight: 600;
+          {% if order.status == 'pending' %}background: #fef3c7; color: #92400e;
+          {% elif order.status == 'paid' %}background: #dbeafe; color: #1e40af;
+          {% elif order.status == 'shipped' %}background: #d1fae5; color: #065f46;
+          {% elif order.status == 'canceled' %}background: #fee2e2; color: #991b1b;
+          {% else %}background: var(--border); color: var(--text);{% endif %}">
+          {{ order.status }}
+        </span>
+      </div>
+      <div style="text-align: right;">
+        <div style="font-size: 18px; font-weight: 700; color: var(--primary);">{{ "{:,.0f}".format(order.total) }} VND</div>
+        <div style="font-size: 13px; color: var(--muted);">{{ order.created_at.strftime('%d/%m/%Y %H:%M') if order.created_at else '' }}</div>
+      </div>
+    </div>
+    <div style="margin-top: 12px; font-size: 14px; color: var(--muted);">
+      {{ order.items|length }} sản phẩm
+    </div>
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state" style="text-align: center; padding: 60px 20px;">
+  <h3 style="margin: 0 0 16px 0;">Chưa có đơn hàng</h3>
+  <p style="color: var(--muted); margin-bottom: 24px;">Hãy mua sắm và đặt hàng.</p>
+  <a href="{{ url_for('books_list') }}" class="btn primary">Mua sắm ngay</a>
+</div>
+{% endif %}
+{% endblock %}

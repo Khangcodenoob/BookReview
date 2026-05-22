@@ -6,15 +6,19 @@
   <p class="muted">Chỉ dành cho admin</p>
     <a class="btn" href="{{ url_for('admin_books_new') }}">+ Thêm sách</a>
     <form method="post" action="{{ url_for('admin_seed_demo') }}" onsubmit="return confirm('Thêm sách demo?')" style="display:inline-block;margin-left:8px">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       <button class="btn secondary" type="submit">Seed sách demo</button>
     </form>
     <form method="post" action="{{ url_for('admin_fix_book_codes') }}" onsubmit="return confirm('Tự sinh mã sách mất?')" style="display:inline-block;margin-left:8px">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       <button class="btn secondary" type="submit">Tự sinh mã sách mất</button>
     </form>
   <form method="post" action="{{ url_for('admin_generate_long_reviews') }}" onsubmit="return confirm('Tạo review mẫu dài cho các sách chưa có review?')" style="display:inline-block;margin-left:8px">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <button class="btn secondary" type="submit">Tạo review mẫu dài</button>
   </form>
   <form method="post" action="{{ url_for('admin_generate_long_summaries') }}" onsubmit="return confirm('Tạo/cập nhật tóm tắt dài cho các sách mô tả ngắn?')" style="display:inline-block;margin-left:8px">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <button class="btn secondary" type="submit">Tạo tóm tắt dài</button>
   </form>
 </div>
@@ -62,6 +66,7 @@
       <td>
         <a href="{{ url_for('admin_books_edit', book_id=b.id) }}" style="background: #10b981; color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: 600; margin-right: 8px; display: inline-block; width: 70px; text-align: center; box-sizing: border-box;">Sửa</a>
         <form method="post" action="{{ url_for('admin_books_delete', book_id=b.id) }}" onsubmit="return confirm('Xoá sách này?')" style="display:inline-block;">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           <button type="submit" style="background: #ef4444; color: white; padding: 8px 16px; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; width: 70px; text-align: center; box-sizing: border-box;">Xoá</button>
         </form>
       </td>
